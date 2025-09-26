@@ -1,0 +1,58 @@
+{
+	"name": "n8n-nodes-fibery",
+	"version": "0.1.0",
+	"description": "n8n node for Fibery",
+	"license": "MIT",
+	"homepage": "https://n8n.io",
+	"keywords": [
+		"n8n-community-node-package",
+		"fibery"
+	],
+	"author": {
+		"name": "Misha Yermolayev",
+		"email": "mish@fibery.io"
+	},
+	"repository": {
+		"type": "git",
+		"url": ""
+	},
+	"scripts": {
+		"build": "n8n-node build",
+		"build:watch": "tsc --watch",
+		"dev": "n8n-node dev",
+		"lint": "n8n-node lint",
+		"lint:fix": "n8n-node lint --fix",
+		"release": "n8n-node release",
+		"prepublishOnly": "n8n-node prerelease"
+	},
+	"files": [
+		"dist"
+	],
+	"n8n": {
+		"n8nNodesApiVersion": 1,
+		"credentials": [
+			"dist/credentials/FiberyTokenApi.credentials.js"
+		],
+		"nodes": [
+			"dist/nodes/Fibery/Fibery.node.js"
+		]
+	},
+	"devDependencies": {
+		"@n8n/node-cli": "*",
+		"@types/lodash": "4.17.20",
+		"eslint": "9.32.0",
+		"prettier": "3.6.2",
+		"release-it": "^19.0.4",
+		"typescript": "5.9.2"
+	},
+	"peerDependencies": {
+		"n8n-workflow": "*"
+	},
+	"dependencies": {
+		"@fibery/schema": "10.2.8",
+		"change-case": "5.4.4",
+		"lodash": "4.17.21",
+		"lru-cache": "11.2.1",
+		"moment-timezone": "0.6.0"
+	}
+}
