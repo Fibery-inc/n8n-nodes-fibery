@@ -8,6 +8,7 @@ import {
 	ILoadOptionsFunctions,
 	IPollFunctions,
 	NodeApiError,
+	IHookFunctions,
 } from 'n8n-workflow';
 
 const schemaCache = new LRUCache<string, { etag: string; schema: Schema }>({
@@ -16,8 +17,17 @@ const schemaCache = new LRUCache<string, { etag: string; schema: Schema }>({
 });
 const schemaRequestsPromisesMap = new Map<string, Promise<Schema>>();
 
+export async function getBaseUrl(
+	this: IExecuteFunctions | ILoadOptionsFunctions | IPollFunctions | IHookFunctions,
+) {
+	const authenticationMethod = this.getNodeParameter('authentication', 0) as string;
+	const credentials = await this.getCredentials<{ workspace: string }>(authenticationMethod);
+
+	return `https://${credentials.workspace}.fibery.io`;
+}
+
 export async function apiRequest(
-	this: IExecuteFunctions | ILoadOptionsFunctions | IPollFunctions,
+	this: IExecuteFunctions | ILoadOptionsFunctions | IPollFunctions | IHookFunctions,
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject | IDataObject[] | undefined = undefined,
@@ -25,7 +35,8 @@ export async function apiRequest(
 	options: IRequestOptions = {},
 ) {
 	const authenticationMethod = this.getNodeParameter('authentication', 0) as string;
-	const credentials = await this.getCredentials<{ workspace: string }>(authenticationMethod);
+
+	const baseUrl = await getBaseUrl.call(this);
 
 	const finalOptions: IRequestOptions = {
 		headers: {
@@ -34,7 +45,7 @@ export async function apiRequest(
 		},
 		method,
 		body,
-		uri: `https://${credentials.workspace}.fibery.io/api/${endpoint}`,
+		uri: `${baseUrl}/api/${endpoint}`,
 		useQuerystring: false,
 		json: true,
 		...options,

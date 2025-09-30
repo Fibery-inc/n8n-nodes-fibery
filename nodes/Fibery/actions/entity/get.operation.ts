@@ -1,4 +1,5 @@
 import {
+	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
 	INodeParameterResourceLocator,
@@ -7,8 +8,9 @@ import {
 } from 'n8n-workflow';
 import { entityRLC } from '../common.descriptions';
 import { prepareFiberyError } from '../helpers/utils';
-import { executeSingleCommand, getSchema } from '../transport';
+import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
 import { getSelectWithSupportedFields } from './getSelectWithSupportedFields';
+import { addEntityLink } from '../helpers/schema';
 
 const displayOptions = {
 	show: {
@@ -73,10 +75,17 @@ export async function execute(
 					},
 				},
 			};
-			const responseData = await executeSingleCommand.call(this, command);
+			const [responseData, baseUrl] = await Promise.all([
+				executeSingleCommand.call(this, command),
+				getBaseUrl.call(this),
+			]);
+
+			const data = responseData.map((entity: IDataObject) =>
+				addEntityLink(entity, typeObject, baseUrl),
+			);
 
 			const executionData = this.helpers.constructExecutionMetaData(
-				this.helpers.returnJsonArray(responseData),
+				this.helpers.returnJsonArray(data),
 				{
 					itemData: { item: i },
 				},

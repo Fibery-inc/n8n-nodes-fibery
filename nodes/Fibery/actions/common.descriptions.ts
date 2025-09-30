@@ -6,11 +6,6 @@ export const databaseRLC: INodeProperties = {
 	type: 'resourceLocator',
 	default: { mode: 'list', value: '' },
 	required: true,
-	displayOptions: {
-		show: {
-			resource: ['entity'],
-		},
-	},
 	modes: [
 		{
 			displayName: 'From List',

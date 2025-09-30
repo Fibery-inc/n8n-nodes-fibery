@@ -1,5 +1,6 @@
-import { FieldObject } from '@fibery/schema';
+import { FieldObject, TypeObject } from '@fibery/schema';
 import { ControlTypes } from '../constants';
+import { IDataObject } from 'n8n-workflow';
 
 export const isSingleReferenceField = (fieldObject: FieldObject) => {
 	const fieldTypeObject = fieldObject.typeObject;
@@ -93,4 +94,34 @@ export const isSearchableField = (fieldObject: FieldObject) => {
 
 export const isCollabDoc = (fieldObject: FieldObject) => {
 	return fieldObject.type === `Collaboration~Documents/Document`;
+};
+
+const urlAllowedChars = [`$`, `-`, `_`, `.`, `+`, `!`, `*`, `'`, `(`, `)`, `,`];
+
+const escapeRegExpChar = (x: string) => `\\${x}`;
+const urlAllowedCharsPatternGroup = `a-zA-Z0-9${urlAllowedChars.map(escapeRegExpChar).join('')}`;
+const nonUrlChars = new RegExp(`[^${urlAllowedCharsPatternGroup}]+`, 'g');
+
+const makeLocator = (publicId: string, title?: string) => {
+	if (!publicId) {
+		throw new Error('publicId is required');
+	}
+	const limit = 100;
+	return [
+		title && title.replace(nonUrlChars, ' ').trim().replace(/ /g, '_').substring(0, limit),
+		publicId,
+	]
+		.filter(Boolean)
+		.join('-');
+};
+
+export const fiberyUrlName = 'Fibery Url';
+
+export const addEntityLink = (entity: IDataObject, typeObject: TypeObject, baseUrl: string) => {
+	const path = `/${typeObject.name.replace(/ /g, '_')}/${makeLocator(
+		entity[typeObject.publicIdFieldObject.name] as string,
+		entity[typeObject.titleFieldObject.name] as string,
+	)}`;
+	entity[fiberyUrlName] = encodeURI(`${baseUrl}${path}`);
+	return entity;
 };

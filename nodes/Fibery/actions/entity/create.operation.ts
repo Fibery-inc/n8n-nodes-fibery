@@ -6,9 +6,13 @@ import {
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
-import { isCollectionReferenceField, isSingleReferenceField } from '../helpers/schema';
+import {
+	addEntityLink,
+	isCollectionReferenceField,
+	isSingleReferenceField,
+} from '../helpers/schema';
 import { prepareFiberyError } from '../helpers/utils';
-import { executeBatchCommands, executeSingleCommand, getSchema } from '../transport';
+import { executeBatchCommands, executeSingleCommand, getBaseUrl, getSchema } from '../transport';
 import moment from 'moment-timezone';
 import { ControlTypes } from '../constants';
 
@@ -296,14 +300,19 @@ export async function execute(
 				},
 			};
 
-			const responseData = await executeSingleCommand.call(this, command);
+			const [responseData, baseUrl] = await Promise.all([
+				executeSingleCommand.call(this, command),
+				getBaseUrl.call(this),
+			]);
 
-			const entityId = responseData[typeObject.idField];
+			const data = addEntityLink(responseData, typeObject, baseUrl);
+
+			const entityId = data[typeObject.idField] as string;
 
 			await addCollectionItems.call(this, entityId, collections);
 
 			const executionData = this.helpers.constructExecutionMetaData(
-				this.helpers.returnJsonArray(responseData),
+				this.helpers.returnJsonArray(data),
 				{
 					itemData: { item: i },
 				},

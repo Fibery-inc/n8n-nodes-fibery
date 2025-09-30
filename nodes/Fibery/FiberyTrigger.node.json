@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-base.fiberyTrigger",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Productivity", "Data & Storage"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://docs.n8n.io/integrations/builtin/credentials/fibery/"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://docs.n8n.io/integrations/builtin/trigger-nodes/n8n-nodes-base.fiberytrigger/"
+			}
+		]
+	}
+}

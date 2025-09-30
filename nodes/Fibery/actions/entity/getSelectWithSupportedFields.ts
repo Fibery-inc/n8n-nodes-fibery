@@ -21,12 +21,12 @@ export const getSelectWithSupportedFields = (typeObject: TypeObject) => {
 			}
 
 			if (isCollabDoc(fieldObject)) {
-				select[fieldObject.title] = [fieldObject.name, 'Collaboration~Documents/secret'];
+				select[fieldObject.name] = [fieldObject.name, 'Collaboration~Documents/secret'];
 				return select;
 			}
 
 			if (isSingleReferenceField(fieldObject)) {
-				select[fieldObject.title] = {
+				select[fieldObject.name] = {
 					id: [fieldObject.name, fieldObject.typeObject.idField],
 					name: [fieldObject.name, fieldObject.typeObject.titleField],
 				};
@@ -34,7 +34,7 @@ export const getSelectWithSupportedFields = (typeObject: TypeObject) => {
 			}
 
 			if (isCollectionReferenceField(fieldObject)) {
-				select[fieldObject.title] = {
+				select[fieldObject.name] = {
 					'q/from': fieldObject.name,
 					'q/limit': 200,
 					'q/select': {
@@ -45,7 +45,7 @@ export const getSelectWithSupportedFields = (typeObject: TypeObject) => {
 				return select;
 			}
 
-			select[fieldObject.title] = fieldObject.name;
+			select[fieldObject.name] = fieldObject.name;
 			return select;
 		},
 		{} as Record<string, unknown>,

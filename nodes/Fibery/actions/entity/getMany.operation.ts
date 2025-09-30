@@ -10,8 +10,9 @@ import {
 import { ControlType, ControlTypes } from '../constants';
 import { Operator, operators, operatorsPerControl, operatorToCommand } from '../helpers/search';
 import { prepareFiberyError } from '../helpers/utils';
-import { executeSingleCommand, getSchema } from '../transport';
+import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
 import { getSelectWithSupportedFields } from './getSelectWithSupportedFields';
+import { addEntityLink } from '../helpers/schema';
 
 const getFilterOperators = () => {
 	const elements: INodeProperties[] = [];
@@ -335,10 +336,17 @@ export async function execute(
 					},
 				},
 			};
-			const responseData = await executeSingleCommand.call(this, command);
+			const [responseData, baseUrl] = await Promise.all([
+				executeSingleCommand.call(this, command),
+				getBaseUrl.call(this),
+			]);
+
+			const data = responseData.map((entity: IDataObject) =>
+				addEntityLink(entity, typeObject, baseUrl),
+			);
 
 			const executionData = this.helpers.constructExecutionMetaData(
-				this.helpers.returnJsonArray(responseData),
+				this.helpers.returnJsonArray(data),
 				{
 					itemData: { item: i },
 				},

@@ -35,7 +35,8 @@
 			"dist/credentials/FiberyTokenApi.credentials.js"
 		],
 		"nodes": [
-			"dist/nodes/Fibery/Fibery.node.js"
+			"dist/nodes/Fibery/Fibery.node.js",
+			"dist/nodes/Fibery/FiberyTrigger.node.js"
 		]
 	},
 	"devDependencies": {
