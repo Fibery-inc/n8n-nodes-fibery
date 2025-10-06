@@ -47,3 +47,49 @@ export const entityRLC = {
 		},
 	],
 } as const satisfies INodeProperties;
+
+export const entityOutput: INodeProperties[] = [
+	{
+		displayName: 'Output',
+		displayOptions: {
+			show: {
+				resource: ['entity'],
+			},
+		},
+		type: 'options',
+		name: 'output',
+		default: 'simplified',
+		options: [
+			{
+				name: 'Simplified',
+				value: 'simplified',
+			},
+			{
+				name: 'Raw',
+				value: 'raw',
+			},
+			{
+				name: 'Selected Fields',
+				value: 'selectedFields',
+			},
+		],
+	},
+	{
+		displayName: 'Fields To Select',
+		name: 'fieldsToSelect',
+		type: 'multiOptions',
+		noDataExpression: true,
+		default: ['fibery/id'],
+		displayOptions: {
+			show: {
+				output: ['selectedFields'],
+			},
+		},
+		description:
+			'Comma-separated list of fields to include in the response (optional). Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
+		typeOptions: {
+			loadOptionsDependsOn: ['database'],
+			loadOptionsMethod: 'loadFields',
+		},
+	},
+];

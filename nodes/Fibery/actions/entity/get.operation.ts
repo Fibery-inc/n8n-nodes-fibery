@@ -6,11 +6,11 @@ import {
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
-import { entityRLC } from '../common.descriptions';
+import { entityOutput, entityRLC } from '../common.descriptions';
 import { prepareFiberyError } from '../helpers/utils';
 import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
-import { getSelectWithSupportedFields } from './getSelectWithSupportedFields';
-import { addEntityLink } from '../helpers/schema';
+import { formatEntityToOutput } from './formatEntityToOutput';
+import { getFieldsSelect } from './getFieldsSelect';
 
 const displayOptions = {
 	show: {
@@ -19,22 +19,7 @@ const displayOptions = {
 	},
 };
 
-const properties: INodeProperties[] = [
-	entityRLC,
-	// {
-	// 	displayName: 'Fields To Select',
-	// 	name: 'fields',
-	// 	type: 'multiOptions',
-	// 	noDataExpression: true,
-	// 	default: ['fibery/id'],
-	// 	description:
-	// 		'Comma-separated list of fields to include in the response (optional). Choose from the list, or specify IDs using an <a href="https://docs.n8n.io/code/expressions/">expression</a>.',
-	// 	typeOptions: {
-	// 		loadOptionsDependsOn: ['database'],
-	// 		loadOptionsMethod: 'loadFields',
-	// 	},
-	// },
-];
+const properties: INodeProperties[] = [entityRLC, ...entityOutput];
 
 export const description = updateDisplayOptions(displayOptions, properties);
 
@@ -58,7 +43,7 @@ export async function execute(
 
 			const typeObject = schema.typeObjectsByName[database];
 
-			const select = getSelectWithSupportedFields(typeObject);
+			const select = getFieldsSelect.call(this, i, typeObject);
 
 			const command = {
 				command: 'fibery.entity/query',
@@ -81,7 +66,7 @@ export async function execute(
 			]);
 
 			const data = responseData.map((entity: IDataObject) =>
-				addEntityLink(entity, typeObject, baseUrl),
+				formatEntityToOutput.call(this, i, entity, typeObject, baseUrl),
 			);
 
 			const executionData = this.helpers.constructExecutionMetaData(

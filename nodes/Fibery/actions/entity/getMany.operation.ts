@@ -7,12 +7,13 @@ import {
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
+import { entityOutput } from '../common.descriptions';
 import { ControlType, ControlTypes } from '../constants';
 import { Operator, operators, operatorsPerControl, operatorToCommand } from '../helpers/search';
 import { prepareFiberyError } from '../helpers/utils';
 import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
-import { getSelectWithSupportedFields } from './getSelectWithSupportedFields';
-import { addEntityLink } from '../helpers/schema';
+import { formatEntityToOutput } from './formatEntityToOutput';
+import { getFieldsSelect } from './getFieldsSelect';
 
 const getFilterOperators = () => {
 	const elements: INodeProperties[] = [];
@@ -173,6 +174,7 @@ const properties: INodeProperties[] = [
 		default: 50,
 		description: 'Max number of results to return',
 	},
+	...entityOutput,
 	{
 		displayName: 'Filter',
 		name: 'filterType',
@@ -315,7 +317,7 @@ export async function execute(
 
 			const typeObject = schema.typeObjectsByName[database];
 
-			const select = getSelectWithSupportedFields(typeObject);
+			const select = getFieldsSelect.call(this, i, typeObject);
 			const { where, params } =
 				filterType === 'manual'
 					? getWhere(conditions, matchType, typeObject, timezone)
@@ -342,7 +344,7 @@ export async function execute(
 			]);
 
 			const data = responseData.map((entity: IDataObject) =>
-				addEntityLink(entity, typeObject, baseUrl),
+				formatEntityToOutput.call(this, i, entity, typeObject, baseUrl),
 			);
 
 			const executionData = this.helpers.constructExecutionMetaData(

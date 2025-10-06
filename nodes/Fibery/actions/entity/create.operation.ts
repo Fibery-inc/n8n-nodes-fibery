@@ -1,4 +1,5 @@
 import { TypeObject } from '@fibery/schema';
+import moment from 'moment-timezone';
 import {
 	IDataObject,
 	IExecuteFunctions,
@@ -6,15 +7,13 @@ import {
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
-import {
-	addEntityLink,
-	isCollectionReferenceField,
-	isSingleReferenceField,
-} from '../helpers/schema';
+import { entityOutput } from '../common.descriptions';
+import { ControlTypes } from '../constants';
+import { isCollectionReferenceField, isSingleReferenceField } from '../helpers/schema';
 import { prepareFiberyError } from '../helpers/utils';
 import { executeBatchCommands, executeSingleCommand, getBaseUrl, getSchema } from '../transport';
-import moment from 'moment-timezone';
-import { ControlTypes } from '../constants';
+import { formatEntityToOutput } from './formatEntityToOutput';
+import { getFieldsSelect } from './getFieldsSelect';
 
 const fieldUIControls: INodeProperties[] = [
 	{
@@ -144,6 +143,7 @@ const displayOptions = {
 };
 
 const properties: INodeProperties[] = [
+	...entityOutput,
 	{
 		displayName: 'Fields',
 		name: 'fields',
@@ -305,11 +305,30 @@ export async function execute(
 				getBaseUrl.call(this),
 			]);
 
-			const data = addEntityLink(responseData, typeObject, baseUrl);
-
-			const entityId = data[typeObject.idField] as string;
+			const entityId = responseData[typeObject.idField] as string;
 
 			await addCollectionItems.call(this, entityId, collections);
+
+			const select = getFieldsSelect.call(this, i, typeObject);
+			const queryCmd = {
+				command: 'fibery.entity/query',
+				args: {
+					query: {
+						'q/from': database,
+						'q/select': select,
+						'q/limit': 1,
+						'q/offset': 0,
+						'q/where': ['=', [typeObject.idField], '$entityId'],
+					},
+					params: {
+						$entityId: entityId,
+					},
+				},
+			};
+
+			const createdEntity = await executeSingleCommand.call(this, queryCmd);
+
+			const data = formatEntityToOutput.call(this, i, createdEntity, typeObject, baseUrl);
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),

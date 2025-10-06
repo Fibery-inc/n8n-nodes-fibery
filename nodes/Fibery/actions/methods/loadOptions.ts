@@ -1,7 +1,13 @@
 import { FieldObject } from '@fibery/schema';
 import moment from 'moment-timezone';
 import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
-import { fiberyFieldToN8nControlType, isSearchableField, isWritableField } from '../helpers/schema';
+import {
+	fiberyFieldToN8nControlType,
+	fiberyUrlName,
+	getSupportedFieldObjects,
+	isSearchableField,
+	isWritableField,
+} from '../helpers/schema';
 import { executeSingleCommand, getSchema } from '../transport';
 
 export async function loadFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
@@ -11,10 +17,17 @@ export async function loadFields(this: ILoadOptionsFunctions): Promise<INodeProp
 
 	const typeObject = schema.typeObjectsByName[database];
 
-	return typeObject.fieldObjects.map((fieldObject) => ({
-		name: fieldObject.name,
-		value: fieldObject.name,
-	}));
+	return getSupportedFieldObjects(typeObject)
+		.map((fieldObject) => ({
+			name: fieldObject.name,
+			value: fieldObject.name,
+		}))
+		.concat([
+			{
+				name: fiberyUrlName,
+				value: fiberyUrlName,
+			},
+		]);
 }
 
 const fieldObjectToOption = (fieldObject: FieldObject) => ({

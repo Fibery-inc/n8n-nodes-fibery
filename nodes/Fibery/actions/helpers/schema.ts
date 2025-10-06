@@ -125,3 +125,14 @@ export const addEntityLink = (entity: IDataObject, typeObject: TypeObject, baseU
 	entity[fiberyUrlName] = encodeURI(`${baseUrl}${path}`);
 	return entity;
 };
+
+const sortFieldObjects = (a: FieldObject, b: FieldObject) => {
+	const aOrder = a.isTitle ? -1 : a.objectEditorOrder;
+	const bOrder = b.isTitle ? -1 : b.objectEditorOrder;
+
+	return aOrder - bOrder;
+};
+
+export const getSupportedFieldObjects = (typeObject: TypeObject) => {
+	return typeObject.fieldObjects.filter(isSupportedField).sort(sortFieldObjects);
+};
