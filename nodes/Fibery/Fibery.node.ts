@@ -109,6 +109,7 @@ export class Fibery implements INodeType {
 			switch (op) {
 				case 'deleteOperation':
 				case 'create':
+				case 'update':
 				case 'get':
 				case 'getMany': {
 					const returnData = await entity[op].execute.call(this, items, database);

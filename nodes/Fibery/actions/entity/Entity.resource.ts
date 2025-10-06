@@ -4,9 +4,10 @@ import * as create from './create.operation';
 import * as get from './get.operation';
 import * as getMany from './getMany.operation';
 import * as deleteOperation from './delete.operation';
+import * as update from './update.operation';
 import { databaseRLC } from '../common.descriptions';
 
-export { create, get, getMany, deleteOperation };
+export { create, get, getMany, deleteOperation, update };
 
 export const description: INodeProperties[] = [
 	{
@@ -22,22 +23,28 @@ export const description: INodeProperties[] = [
 				action: 'Create an entity',
 			},
 			{
-				name: 'Get',
-				value: 'get',
-				description: 'Get an entity',
-				action: 'Get an entity',
-			},
-			{
 				name: 'Delete',
 				value: 'delete',
 				description: 'Delete an entity',
 				action: 'Delete an entity',
 			},
 			{
+				name: 'Get',
+				value: 'get',
+				description: 'Get an entity',
+				action: 'Get an entity',
+			},
+			{
 				name: 'Get Many',
 				value: 'getMany',
 				description: 'Get many entities from a database',
 				action: 'Get many entities',
+			},
+			{
+				name: 'Update',
+				value: 'update',
+				description: 'Update an entity',
+				action: 'Update an entity',
 			},
 		],
 		default: 'create',
@@ -52,4 +59,5 @@ export const description: INodeProperties[] = [
 	...get.description,
 	...deleteOperation.description,
 	...getMany.description,
+	...update.description,
 ];

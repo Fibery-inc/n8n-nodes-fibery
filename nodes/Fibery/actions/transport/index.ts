@@ -156,3 +156,29 @@ export async function getSchema(this: IExecuteFunctions | ILoadOptionsFunctions 
 
 	return promise;
 }
+
+export type CollectionItem = {
+	field: string;
+	values: string[];
+	type: string;
+};
+
+export async function addCollectionItems(
+	this: IExecuteFunctions,
+	entityId: string,
+	collections: CollectionItem[],
+) {
+	const addCollectionItemsCommands = collections.map(({ field, values, type }) => ({
+		command: `fibery.entity/add-collection-items`,
+		args: {
+			entity: { 'fibery/id': entityId },
+			field: field,
+			items: values.map((v) => ({ 'fibery/id': v })),
+			type: type,
+		},
+	}));
+
+	if (addCollectionItemsCommands.length > 0) {
+		await executeBatchCommands.call(this, addCollectionItemsCommands);
+	}
+}
