@@ -1,7 +1,7 @@
 import { FieldObject, TypeObject } from '@fibery/schema';
 import { ControlTypes } from '../constants';
 import { IDataObject } from 'n8n-workflow';
-//
+
 export const isSingleReferenceField = (fieldObject: FieldObject) => {
 	const fieldTypeObject = fieldObject.typeObject;
 	return (
