@@ -34,12 +34,10 @@ export async function execute(
 
 	for (let i = 0; i < items.length; i++) {
 		try {
-			const { mode, value: entityId } = this.getNodeParameter(
+			const { value: entityId } = this.getNodeParameter(
 				'entity',
 				i,
 			) as INodeParameterResourceLocator;
-
-			const whereField = mode === 'uuid' ? 'fibery/id' : 'fibery/public-id';
 
 			const typeObject = schema.typeObjectsByName[database];
 
@@ -53,7 +51,7 @@ export async function execute(
 						'q/select': select,
 						'q/limit': 1,
 						'q/offset': 0,
-						'q/where': ['=', [whereField], '$entityId'],
+						'q/where': ['=', [typeObject.idField], '$entityId'],
 					},
 					params: {
 						$entityId: entityId,

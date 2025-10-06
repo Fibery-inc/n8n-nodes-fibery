@@ -321,7 +321,7 @@ export async function execute(
 			const { where, params } =
 				filterType === 'manual'
 					? getWhere(conditions, matchType, typeObject, timezone)
-					: { where: [], params: {} };
+					: { where: undefined, params: {} };
 
 			const command = {
 				command: 'fibery.entity/query',
