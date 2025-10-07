@@ -52,6 +52,9 @@ export const fiberyFieldToN8nControlType = (fieldObject: FieldObject) => {
 			if (isCollectionReferenceField(fieldObject)) {
 				return ControlTypes.multiSelect;
 			}
+			if (isCollabDoc(fieldObject)) {
+				return ControlTypes.textArea;
+			}
 			return null;
 		}
 	}
@@ -122,8 +125,11 @@ export const addEntityLink = (entity: IDataObject, typeObject: TypeObject, baseU
 		entity[typeObject.publicIdFieldObject.name] as string,
 		entity[typeObject.titleFieldObject.name] as string,
 	)}`;
-	entity[fiberyUrlName] = encodeURI(`${baseUrl}${path}`);
-	return entity;
+
+	return {
+		...entity,
+		[fiberyUrlName]: encodeURI(`${baseUrl}${path}`),
+	};
 };
 
 const sortFieldObjects = (a: FieldObject, b: FieldObject) => {

@@ -10,7 +10,7 @@ import { entityInput, entityOutput, entityRLC } from '../common.descriptions';
 import { prepareFiberyError } from '../helpers/utils';
 import { addCollectionItems, executeSingleCommand, getBaseUrl, getSchema } from '../transport';
 import { buildEntityUpdate } from './buildEntityUpdate';
-import { formatEntityToOutput } from './formatEntityToOutput';
+import { formatEntitiesOutput } from './formatEntityToOutput';
 import { getFieldsSelect } from './getFieldsSelect';
 
 const displayOptions = {
@@ -85,9 +85,9 @@ export async function execute(
 				},
 			};
 
-			const [updatedEntity] = await executeSingleCommand.call(this, queryCmd);
+			const updatedEntities = await executeSingleCommand.call(this, queryCmd);
 
-			const data = formatEntityToOutput.call(this, i, updatedEntity, typeObject, baseUrl);
+			const data = await formatEntitiesOutput.call(this, i, updatedEntities, typeObject, baseUrl);
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),

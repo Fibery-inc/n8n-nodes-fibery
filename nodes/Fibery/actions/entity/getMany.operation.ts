@@ -12,7 +12,7 @@ import { ControlType, ControlTypes } from '../constants';
 import { Operator, operators, operatorsPerControl, operatorToCommand } from '../helpers/search';
 import { prepareFiberyError } from '../helpers/utils';
 import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
-import { formatEntityToOutput } from './formatEntityToOutput';
+import { formatEntitiesOutput } from './formatEntityToOutput';
 import { getFieldsSelect } from './getFieldsSelect';
 
 const getFilterOperators = () => {
@@ -343,9 +343,7 @@ export async function execute(
 				getBaseUrl.call(this),
 			]);
 
-			const data = responseData.map((entity: IDataObject) =>
-				formatEntityToOutput.call(this, i, entity, typeObject, baseUrl),
-			);
+			const data = await formatEntitiesOutput.call(this, i, responseData, typeObject, baseUrl);
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),

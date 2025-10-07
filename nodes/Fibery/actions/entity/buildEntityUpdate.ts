@@ -1,7 +1,7 @@
 import { TypeObject } from '@fibery/schema';
 import moment from 'moment-timezone';
 import { IDataObject } from 'n8n-workflow';
-import { isCollectionReferenceField, isSingleReferenceField } from '../helpers/schema';
+import { isCollabDoc, isCollectionReferenceField, isSingleReferenceField } from '../helpers/schema';
 import { CollectionItem } from '../transport';
 
 export const buildEntityUpdate = (
@@ -11,6 +11,7 @@ export const buildEntityUpdate = (
 ) => {
 	const entity: Record<string, unknown> = {};
 	const collections: CollectionItem[] = [];
+	const collabDocs: { field: string; content: string }[] = [];
 
 	for (const fieldValue of fieldValues) {
 		const { key, value, valueStart, valueEnd, checked, timezone } = fieldValue;
@@ -55,6 +56,11 @@ export const buildEntityUpdate = (
 							values: value as string[],
 							type: fieldObject.holderType,
 						});
+					} else if (isCollabDoc(fieldObject)) {
+						collabDocs.push({
+							field: name,
+							content: value as string,
+						});
 					} else {
 						entity[name] = value;
 					}
@@ -63,5 +69,5 @@ export const buildEntityUpdate = (
 		}
 	}
 
-	return { entity, collections };
+	return { entity, collections, collabDocs };
 };

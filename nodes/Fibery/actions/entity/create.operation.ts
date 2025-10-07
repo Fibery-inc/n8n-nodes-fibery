@@ -7,10 +7,18 @@ import {
 } from 'n8n-workflow';
 import { entityInput, entityOutput } from '../common.descriptions';
 import { prepareFiberyError } from '../helpers/utils';
-import { addCollectionItems, executeSingleCommand, getBaseUrl, getSchema } from '../transport';
+import {
+	addCollectionItems,
+	createEntity,
+	executeSingleCommand,
+	getBaseUrl,
+	getSchema,
+	updateCollaborationDocuments,
+} from '../transport';
 import { buildEntityUpdate } from './buildEntityUpdate';
-import { formatEntityToOutput } from './formatEntityToOutput';
+import { formatEntitiesOutput } from './formatEntityToOutput';
 import { getFieldsSelect } from './getFieldsSelect';
+import { isCollabDoc } from '../helpers/schema';
 
 const displayOptions = {
 	show: {
@@ -39,24 +47,36 @@ export async function execute(
 		try {
 			const fieldValues = this.getNodeParameter('fields.field', i, []) as IDataObject[];
 
-			const { entity, collections } = buildEntityUpdate(fieldValues, typeObject, timezone);
+			const { entity, collections, collabDocs } = buildEntityUpdate(
+				fieldValues,
+				typeObject,
+				timezone,
+			);
 
-			const command = {
-				command: 'fibery.entity/create',
-				args: {
-					type: database,
-					entity,
+			const docSecretsSelect = typeObject.fieldObjects.reduce(
+				(acc, fieldObject) => {
+					if (isCollabDoc(fieldObject)) {
+						acc[fieldObject.name] = [fieldObject.name, 'Collaboration~Documents/secret'];
+					}
+					return acc;
 				},
-			};
+				{} as Record<string, unknown>,
+			);
 
 			const [responseData, baseUrl] = await Promise.all([
-				executeSingleCommand.call(this, command),
+				createEntity.call(this, database, entity, {
+					[typeObject.idField]: typeObject.idField,
+					...docSecretsSelect,
+				}),
 				getBaseUrl.call(this),
 			]);
 
 			const entityId = responseData[typeObject.idField] as string;
 
-			await addCollectionItems.call(this, entityId, collections);
+			await Promise.all([
+				addCollectionItems.call(this, entityId, collections),
+				updateCollaborationDocuments.call(this, collabDocs, responseData),
+			]);
 
 			const select = getFieldsSelect.call(this, i, typeObject);
 			const queryCmd = {
@@ -75,9 +95,9 @@ export async function execute(
 				},
 			};
 
-			const [createdEntity] = await executeSingleCommand.call(this, queryCmd);
+			const createdEntities = await executeSingleCommand.call(this, queryCmd);
 
-			const data = formatEntityToOutput.call(this, i, createdEntity, typeObject, baseUrl);
+			const data = await formatEntitiesOutput.call(this, i, createdEntities, typeObject, baseUrl);
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),

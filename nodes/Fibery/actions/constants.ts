@@ -1,5 +1,6 @@
 export const ControlTypes = {
 	text: 'text',
+	textArea: 'text-area',
 	number: 'number',
 	boolean: 'boolean',
 	date: 'date',

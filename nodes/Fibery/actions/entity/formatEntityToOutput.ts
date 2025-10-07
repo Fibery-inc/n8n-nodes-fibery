@@ -1,23 +1,17 @@
 import { TypeObject } from '@fibery/schema';
 import { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { addEntityLink, fiberyUrlName } from '../helpers/schema';
+import { entitiesWithCollabDos } from './withCollabDocs';
 
-export function formatEntityToOutput(
-	this: IExecuteFunctions,
-	inputIdx: number,
+function formatEntity(
 	entity: IDataObject,
 	typeObject: TypeObject,
 	baseUrl: string,
+	output: 'simplified' | 'raw' | 'selectedFields',
+	selectedFields: string[],
 ) {
-	const output = this.getNodeParameter('output', inputIdx) as
-		| 'simplified'
-		| 'raw'
-		| 'selectedFields';
-
 	switch (output) {
 		case 'selectedFields': {
-			const selectedFields = this.getNodeParameter('fieldsToSelect', inputIdx) as string[];
-
 			return selectedFields.includes(fiberyUrlName)
 				? addEntityLink(entity, typeObject, baseUrl)
 				: entity;
@@ -27,4 +21,28 @@ export function formatEntityToOutput(
 		default:
 			return addEntityLink(entity, typeObject, baseUrl);
 	}
+}
+
+export function formatEntitiesOutput(
+	this: IExecuteFunctions,
+	inputIdx: number,
+	entities: IDataObject[],
+	typeObject: TypeObject,
+	baseUrl: string,
+) {
+	const output = this.getNodeParameter('output', inputIdx) as
+		| 'simplified'
+		| 'raw'
+		| 'selectedFields';
+
+	const selectedFields =
+		output === 'selectedFields'
+			? (this.getNodeParameter('fieldsToSelect', inputIdx) as string[])
+			: [];
+
+	const formatted = entities.map((entity) =>
+		formatEntity(entity, typeObject, baseUrl, output, selectedFields),
+	);
+
+	return entitiesWithCollabDos.call(this, formatted, typeObject);
 }

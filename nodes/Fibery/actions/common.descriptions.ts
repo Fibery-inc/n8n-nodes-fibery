@@ -223,6 +223,20 @@ const fieldUIControls: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Field Value',
+		name: 'value',
+		type: 'string',
+		typeOptions: {
+			rows: 4,
+		},
+		default: '',
+		displayOptions: {
+			show: {
+				type: [ControlTypes.textArea],
+			},
+		},
+	},
 ];
 
 export const entityInput: INodeProperties[] = [

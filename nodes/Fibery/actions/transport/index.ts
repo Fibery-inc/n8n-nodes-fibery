@@ -2,14 +2,15 @@ import { factory, Schema } from '@fibery/schema';
 import { LRUCache } from 'lru-cache';
 import {
 	IDataObject,
-	IRequestOptions,
 	IExecuteFunctions,
+	IHookFunctions,
 	IHttpRequestMethods,
 	ILoadOptionsFunctions,
 	IPollFunctions,
+	IRequestOptions,
 	NodeApiError,
-	IHookFunctions,
 } from 'n8n-workflow';
+import { v7 } from 'uuid';
 
 const schemaCache = new LRUCache<string, { etag: string; schema: Schema }>({
 	max: 100,
@@ -46,7 +47,6 @@ export async function apiRequest(
 		method,
 		body,
 		uri: `${baseUrl}/api/${endpoint}`,
-		useQuerystring: false,
 		json: true,
 		...options,
 	};
@@ -157,6 +157,47 @@ export async function getSchema(this: IExecuteFunctions | ILoadOptionsFunctions 
 	return promise;
 }
 
+export async function createEntity(
+	this: IExecuteFunctions,
+	typeName: string,
+	entity: Record<string, unknown>,
+	select: Record<string, unknown>,
+) {
+	const id = v7();
+
+	const [
+		,
+		{
+			result: [createdEntity],
+		},
+	] = await executeBatchCommands.call(this, [
+		{
+			command: 'fibery.entity/create',
+			args: {
+				type: typeName,
+				entity: {
+					'fibery/id': id,
+					...entity,
+				},
+			},
+		},
+		{
+			command: 'fibery.entity/query',
+			args: {
+				query: {
+					'q/from': typeName,
+					'q/select': select,
+					'q/where': ['=', ['fibery/id'], '$entityId'],
+					'q/limit': 1,
+				},
+				params: { $entityId: id },
+			},
+		},
+	]);
+
+	return createdEntity;
+}
+
 export type CollectionItem = {
 	field: string;
 	values: string[];
@@ -181,4 +222,62 @@ export async function addCollectionItems(
 	if (addCollectionItemsCommands.length > 0) {
 		await executeBatchCommands.call(this, addCollectionItemsCommands);
 	}
+}
+
+async function executeDocumentsCommand(
+	this: IExecuteFunctions,
+	command: IDataObject,
+	format = 'md',
+) {
+	return apiRequest.call(this, 'POST', 'documents/commands', command, undefined, {
+		qs: {
+			format,
+		},
+	});
+}
+
+export async function queryCollaborationDocuments(
+	this: IExecuteFunctions,
+	secrets: string[],
+	format: string,
+) {
+	if (secrets.length === 0) {
+		return [];
+	}
+
+	return executeDocumentsCommand.call(
+		this,
+		{
+			command: 'get-documents',
+			args: secrets.map((secret) => ({ secret })),
+		},
+		format,
+	) as Promise<{ secret: string; content: string }[]>;
+}
+
+export async function updateCollaborationDocuments(
+	this: IExecuteFunctions,
+	collabDocs: { field: string; content: string }[],
+	entity: IDataObject,
+	format?: string,
+) {
+	const secretContentPairs = collabDocs
+		.filter((doc) => entity[doc.field])
+		.map((doc) => ({
+			secret: entity[doc.field],
+			content: doc.content,
+		}));
+
+	if (secretContentPairs.length === 0) {
+		return;
+	}
+
+	return executeDocumentsCommand.call(
+		this,
+		{
+			command: 'create-or-update-documents',
+			args: secretContentPairs,
+		},
+		format,
+	);
 }
