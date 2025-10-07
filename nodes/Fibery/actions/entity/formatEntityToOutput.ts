@@ -3,6 +3,23 @@ import { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { addEntityLink, fiberyUrlName } from '../helpers/schema';
 import { entitiesWithCollabDos } from './withCollabDocs';
 
+function transformFileFieldsToUrls(
+	entity: IDataObject,
+	typeObject: TypeObject,
+	baseUrl: string,
+): IDataObject {
+	const fileFields = typeObject.fieldObjects.filter((f) => f.type === 'fibery/file');
+	fileFields.forEach((field) => {
+		if (entity[field.name]) {
+			entity[field.name] = (entity[field.name] as { name: string; secret: string }[]).map(
+				({ name, secret }) => ({ name, url: encodeURI(`${baseUrl}/api/files/${secret}`) }),
+			);
+		}
+	});
+
+	return entity;
+}
+
 function formatEntity(
 	entity: IDataObject,
 	typeObject: TypeObject,
@@ -10,16 +27,18 @@ function formatEntity(
 	output: 'simplified' | 'raw' | 'selectedFields',
 	selectedFields: string[],
 ) {
+	const entityWithFileUrls = transformFileFieldsToUrls(entity, typeObject, baseUrl);
+
 	switch (output) {
 		case 'selectedFields': {
 			return selectedFields.includes(fiberyUrlName)
-				? addEntityLink(entity, typeObject, baseUrl)
-				: entity;
+				? addEntityLink(entityWithFileUrls, typeObject, baseUrl)
+				: entityWithFileUrls;
 		}
 		case 'simplified':
 		case 'raw':
 		default:
-			return addEntityLink(entity, typeObject, baseUrl);
+			return addEntityLink(entityWithFileUrls, typeObject, baseUrl);
 	}
 }
 

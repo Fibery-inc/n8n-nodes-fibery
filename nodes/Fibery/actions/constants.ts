@@ -8,6 +8,7 @@ export const ControlTypes = {
 	select: 'select',
 	multiSelect: 'multi-select',
 	hidden: 'hidden',
+	file: 'file',
 } as const;
 
 export type ControlType = (typeof ControlTypes)[keyof typeof ControlTypes];

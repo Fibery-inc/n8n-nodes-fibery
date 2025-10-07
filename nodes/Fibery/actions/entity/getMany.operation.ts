@@ -14,6 +14,7 @@ import { prepareFiberyError } from '../helpers/utils';
 import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
 import { formatEntitiesOutput } from './formatEntityToOutput';
 import { getFieldsSelect } from './getFieldsSelect';
+import { downloadEntityFiles } from './downloadEntityFiles';
 
 const getFilterOperators = () => {
 	const elements: INodeProperties[] = [];
@@ -255,6 +256,22 @@ const properties: INodeProperties[] = [
 			},
 		],
 	},
+	{
+		displayName: 'Options',
+		name: 'options',
+		type: 'collection',
+		default: {},
+		placeholder: 'Add Field',
+		options: [
+			{
+				displayName: 'Download Files',
+				name: 'downloadFiles',
+				type: 'boolean',
+				default: false,
+				description: "Whether to download a file if a database's field contains it",
+			},
+		],
+	},
 ];
 
 const getWhere = (
@@ -344,6 +361,17 @@ export async function execute(
 			]);
 
 			const data = await formatEntitiesOutput.call(this, i, responseData, typeObject, baseUrl);
+
+			const options = this.getNodeParameter('options', i);
+
+			if (options.downloadFiles) {
+				const withDownloadedFiles = await downloadEntityFiles.call(this, data, typeObject, [
+					{ item: i },
+				]);
+
+				returnData.push(...withDownloadedFiles);
+				continue;
+			}
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),

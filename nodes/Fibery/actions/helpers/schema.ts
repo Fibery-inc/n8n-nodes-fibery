@@ -65,14 +65,14 @@ export const isSupportedField = (fieldObject: FieldObject) => {
 		fieldObject.type !== `fibery/Button` &&
 		fieldObject.name !== `Collaboration~Documents/References` &&
 		fieldObject.type !== `fibery/view` &&
-		fieldObject.type !== `comments/comment` &&
-		fieldObject.type !== `fibery/file`
+		fieldObject.type !== `comments/comment`
 	);
 };
 
 export const isWritableField = (fieldObject: FieldObject) =>
 	!fieldObject.isReadOnly &&
 	isSupportedField(fieldObject) &&
+	fieldObject.type !== `fibery/file` &&
 	fiberyFieldToN8nControlType(fieldObject);
 
 const SEARCHABLE_TYPES = new Set([
@@ -126,10 +126,9 @@ export const addEntityLink = (entity: IDataObject, typeObject: TypeObject, baseU
 		entity[typeObject.titleFieldObject.name] as string,
 	)}`;
 
-	return {
-		...entity,
-		[fiberyUrlName]: encodeURI(`${baseUrl}${path}`),
-	};
+	entity[fiberyUrlName] = encodeURI(`${baseUrl}${path}`);
+
+	return entity;
 };
 
 const sortFieldObjects = (a: FieldObject, b: FieldObject) => {

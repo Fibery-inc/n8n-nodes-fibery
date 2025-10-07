@@ -37,10 +37,7 @@ export async function entitiesWithCollabDos(
 
 		const { entityIdx, fieldName } = data;
 
-		entities[entityIdx] = {
-			...entities[entityIdx],
-			[fieldName]: doc.content,
-		};
+		entities[entityIdx][fieldName] = doc.content;
 	});
 
 	return entities;

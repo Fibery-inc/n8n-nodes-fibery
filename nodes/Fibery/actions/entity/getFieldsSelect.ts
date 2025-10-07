@@ -66,6 +66,18 @@ export function getFieldsSelect(this: IExecuteFunctions, inputIdx: number, typeO
 			return;
 		}
 
+		if (fieldObject.type === 'fibery/file') {
+			select[fieldObject.name] = {
+				'q/from': [fieldObject.name],
+				'q/limit': 'q/no-limit',
+				'q/select': {
+					name: ['fibery/name'],
+					secret: ['fibery/secret'],
+				},
+			};
+			return;
+		}
+
 		if (isSingleReferenceField(fieldObject)) {
 			select[fieldObject.name] = {
 				id: [fieldObject.name, fieldObject.typeObject.idField],

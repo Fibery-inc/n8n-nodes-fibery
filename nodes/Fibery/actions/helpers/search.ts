@@ -78,6 +78,7 @@ export const operatorsPerControl = {
 		operators.is_empty,
 		operators.is_not_empty,
 	],
+	[ControlTypes.file]: [operators.is_empty, operators.is_not_empty],
 };
 
 const wrapDateRange = (field: string, datePart?: 'q/start' | 'q/end') =>
