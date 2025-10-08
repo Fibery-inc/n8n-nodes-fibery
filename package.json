@@ -15,7 +15,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": ""
+		"url": "https://gitlab.com/fibery/n8n"
 	},
 	"scripts": {
 		"build": "n8n-node build",
