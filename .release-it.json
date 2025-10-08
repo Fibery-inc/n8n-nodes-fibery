@@ -1,0 +1,9 @@
+{
+	"$schema": "https://unpkg.com/release-it@19/schema/release-it.json",
+	"github": {
+		"release": false
+	},
+	"gitlab": {
+		"release": true
+	}
+}

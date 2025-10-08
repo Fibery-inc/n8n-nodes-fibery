@@ -58,5 +58,8 @@
 		"lru-cache": "11.2.1",
 		"moment-timezone": "0.6.0",
 		"uuid": "13.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
 	}
 }
