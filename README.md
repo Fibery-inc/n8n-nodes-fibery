@@ -1,6 +1,6 @@
 # n8n-nodes-fibery
 
-![Fibery x n8n](fibery-x-n8n.png)
+![Fibery x n8n](https://d1f4u7smwbtn85.cloudfront.net/vizydrop-edge.fibery.io/2b0dc7f1-ae9e-45ea-90bf-8b5ee31c54d5?response-content-disposition=inline%3B+filename%3D%22image.png%22&response-content-type=image%2Fpng&Expires=1760545963&Key-Pair-Id=KGJPFJ6T4AGSL&Signature=McqDzqfsKbvRUGKiy9fFnU89BhALaW8cv81osknEST7T2wcJLD-IwykKFWlzMjziOq1lpJcyh1eJPH0nnjZRM4O%7EzBz3BUC9FrelLTnJDKsm5vqEDokAGHZQiuPnxIAfzCDep00CbWs-cZy0l3gzK859SnUzA2LjLz97uiBOB3ZOxr2DxEtLKUbVcegjP12zLk78ZR1mtZakA85-Ztcvi63uzg690VPOZFMoNRFH9Yj-bLnQQfMuw%7EiapRsTgKHQ6A%7ETWazDl8aEuCnE88pDHa7Uiav1JmafEcknetU5sTIx9oA-78Z5QqkY2fIcwAKaeJhS0l8UdEco%7EtZnM3Y8jg__#width=2560&height=1440)
 
 This is an n8n community node. It lets you use Fibery in your n8n workflows.
 
