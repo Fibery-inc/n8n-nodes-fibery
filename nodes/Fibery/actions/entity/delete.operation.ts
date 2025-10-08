@@ -16,8 +16,7 @@ const displayOptions = {
 	},
 };
 
-// TODO: support deleting by public ID ?
-const properties: INodeProperties[] = [{ ...entityRLC, modes: [entityRLC.modes[0]] }];
+const properties: INodeProperties[] = [entityRLC];
 
 export const description = updateDisplayOptions(displayOptions, properties);
 
