@@ -1,8 +1,11 @@
 # n8n-nodes-fibery
 
-This is an n8n community node. It lets you use _app/service name_ in your n8n workflows.
+![Fibery x n8n](fibery-x-n8n.png)
 
-_App/service name_ is _one or two sentences describing the service this node integrates with_.
+This is an n8n community node. It lets you use Fibery in your n8n workflows.
+
+Fibery is your company’s operating system
+It's a work platform that replaces scattered tools and connects teams. Chosen by nerds, appreciated by everyone (almost).
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/reference/license/) workflow automation platform.
 
@@ -18,29 +21,46 @@ _App/service name_ is _one or two sentences describing the service this node int
 
 Follow the [installation guide](https://docs.n8n.io/integrations/community-nodes/installation/) in the n8n community nodes documentation.
 
+1. Go to **Settings** > **Community Nodes**.
+2. Select **Install**.
+3. Enter `@fibery/n8n-nodes-fibery` in **npm Package name**.
+4. Agree to the [risks](https://docs.n8n.io/integrations/community-nodes/risks/) of using community nodes: select **I understand the risks of installing unverified code from a public source**.
+5. Select **Install**.
+
 ## Operations
 
-_List the operations supported by your node._
+### Database
+
+- **get many**. List all databases in the workspace.
+
+### Entity
+
+- **create**. Create a new entity.
+- **delete**. Delete an entity.
+- **get**. Get an entity.s
+- **get many**. Search and list entities from a database.
+- **update**. Update an entity.
+
+### Triggers
+
+- **default**. Handle Fibery events to Database from webhooks.
 
 ## Credentials
 
-_If users need to authenticate with the app/service, provide details here. You should include prerequisites (such as signing up with the service), available authentication methods, and how to set them up._
+At the moment this node supports only one authentication method: **API Key**.
+
+### Using API Key
+
+1. Enter the name of your Fibery workspace in the **Workspace** field. It can be obtained from the URL of your workspace. For example, if your workspace URL is `https://my-company.fibery.io`, then the workspace name is `my-company`.
+2. Obtain an API key from your Fibery workspace. Please follow the [Fibery API keys](https://the.fibery.io/@public/User_Guide/Guide/Fibery-API-keys-252) guide.
+3. Enter API key in the **API Key** field.
 
 ## Compatibility
 
-_State the minimum n8n version, as well as which versions you test against. You can also include any known version incompatibility issues._
-
-## Usage
-
-_This is an optional section. Use it to help users with any difficult or confusing aspects of the node._
-
-_By the time users are looking for community nodes, they probably already know n8n basics. But if you expect new users, you can link to the [Try it out](https://docs.n8n.io/try-it-out/) documentation to help them get started._
+Tested on: 1.111.0
 
 ## Resources
 
-* [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
-* _Link to app/service documentation._
-
-## Version history
-
-_This is another optional section. If your node has multiple versions, include a short description of available versions and what changed, as well as any compatibility impact._
+- [n8n community nodes documentation](https://docs.n8n.io/integrations/#community-nodes)
+- [Fibery](https://www.fibery.io/)
+- [Fibery API documentation](https://the.fibery.io/@public/User_Guide/Guide/Fibery-API-overview-279)
