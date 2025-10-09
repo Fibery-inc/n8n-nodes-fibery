@@ -70,7 +70,7 @@ export class FiberyTrigger implements INodeType {
 				type: 'notice',
 				default: '',
 			},
-			databaseRLC,
+			{ ...databaseRLC, displayOptions: undefined },
 		],
 	};
 
