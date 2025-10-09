@@ -52,10 +52,10 @@
 		"n8n-workflow": "*"
 	},
 	"dependencies": {
-		"change-case": "5.4.4",
+		"change-case": "4.1.2",
 		"lodash": "4.17.21",
-		"moment-timezone": "0.6.0",
-		"uuid": "13.0.0"
+		"moment-timezone": "0.5.48",
+		"uuid": "10.0.0"
 	},
 	"publishConfig": {
 		"access": "public"
