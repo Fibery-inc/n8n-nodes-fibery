@@ -14,7 +14,7 @@ export const description: INodeProperties[] = [
 			{
 				name: 'Get Many',
 				value: 'getAll',
-				description: 'List many the databases',
+				description: 'Get many databases from the workspace',
 				action: 'Get many databases',
 			},
 		],
