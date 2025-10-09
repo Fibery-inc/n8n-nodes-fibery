@@ -50,6 +50,7 @@ export async function execute(
 			const { entity, collections, collabDocs } = buildEntityUpdate(
 				fieldValues,
 				typeObject,
+				schema,
 				timezone,
 			);
 
@@ -78,7 +79,7 @@ export async function execute(
 				updateCollaborationDocuments.call(this, collabDocs, responseData),
 			]);
 
-			const select = getFieldsSelect.call(this, i, typeObject);
+			const select = getFieldsSelect.call(this, i, typeObject, schema);
 			const queryCmd = {
 				command: 'fibery.entity/query',
 				args: {

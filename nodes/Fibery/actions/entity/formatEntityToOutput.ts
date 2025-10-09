@@ -1,7 +1,7 @@
-import { TypeObject } from '@fibery/schema';
 import { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { addEntityLink, fiberyUrlName } from '../helpers/schema';
 import { entitiesWithCollabDos } from './withCollabDocs';
+import { TypeObject } from '../helpers/schema-factory';
 
 function transformFileFieldsToUrls(
 	entity: IDataObject,

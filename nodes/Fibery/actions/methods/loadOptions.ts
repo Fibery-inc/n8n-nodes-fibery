@@ -1,4 +1,3 @@
-import { FieldObject } from '@fibery/schema';
 import moment from 'moment-timezone';
 import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import {
@@ -9,6 +8,7 @@ import {
 	isWritableField,
 } from '../helpers/schema';
 import { executeSingleCommand, getSchema } from '../transport';
+import { FieldObject, Schema } from '../helpers/schema-factory';
 
 export async function loadFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	const database = this.getCurrentNodeParameter('database', { extractValue: true }) as string;
@@ -30,11 +30,11 @@ export async function loadFields(this: ILoadOptionsFunctions): Promise<INodeProp
 		]);
 }
 
-const fieldObjectToOption = (fieldObject: FieldObject) => ({
+const fieldObjectToOption = (fieldObject: FieldObject, schema: Schema) => ({
 	name: fieldObject.title,
 	value: JSON.stringify({
 		name: fieldObject.name,
-		type: fiberyFieldToN8nControlType(fieldObject),
+		type: fiberyFieldToN8nControlType(fieldObject, schema),
 	}),
 });
 
@@ -54,9 +54,11 @@ export async function getWritableFields(
 
 	const typeObject = schema.typeObjectsByName[database];
 
-	const fieldObjects = typeObject.fieldObjects.filter(isWritableField).sort(sortFieldObjects);
+	const fieldObjects = typeObject.fieldObjects
+		.filter((fieldObject) => isWritableField(fieldObject, schema))
+		.sort(sortFieldObjects);
 
-	return fieldObjects.map(fieldObjectToOption);
+	return fieldObjects.map((fieldObject) => fieldObjectToOption(fieldObject, schema));
 }
 
 export async function getSelectOptions(
@@ -72,7 +74,7 @@ export async function getSelectOptions(
 	const typeObject = schema.typeObjectsByName[database];
 	const fieldObject = typeObject.fieldObjectsByName[field];
 
-	const fieldTypeObject = fieldObject.typeObject;
+	const fieldTypeObject = schema.typeObjectsByName[fieldObject.type];
 
 	const command = {
 		command: 'fibery.entity/query',
@@ -121,7 +123,9 @@ export async function getSearchableFields(
 
 	const typeObject = schema.typeObjectsByName[database];
 
-	const fieldObjects = typeObject.fieldObjects.filter(isSearchableField).sort(sortFieldObjects);
+	const fieldObjects = typeObject.fieldObjects
+		.filter((fieldObject) => isSearchableField(fieldObject, schema))
+		.sort(sortFieldObjects);
 
-	return fieldObjects.map(fieldObjectToOption);
+	return fieldObjects.map((fieldObject) => fieldObjectToOption(fieldObject, schema));
 }

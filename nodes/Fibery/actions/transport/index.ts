@@ -1,5 +1,3 @@
-import { factory, Schema } from '@fibery/schema';
-import { LRUCache } from 'lru-cache';
 import {
 	IDataObject,
 	IExecuteFunctions,
@@ -11,9 +9,11 @@ import {
 	NodeApiError,
 } from 'n8n-workflow';
 import { v7 } from 'uuid';
+import { LRUCache } from '../helpers/lru-cache';
+import { makeSchema, RawSchema, Schema } from '../helpers/schema-factory';
 
-const schemaCache = new LRUCache<string, { etag: string; schema: Schema }>({
-	max: 100,
+const schemaCache = new LRUCache<{ etag: string; schema: Schema }>({
+	maxSize: 100,
 	ttl: 1000 * 60 * 10,
 });
 const schemaRequestsPromisesMap = new Map<string, Promise<Schema>>();
@@ -95,7 +95,7 @@ async function getRawSchema(
 			resolveWithFullResponse: true,
 		});
 
-		const rawSchema = response.body;
+		const rawSchema = response.body as RawSchema;
 		return {
 			useCache: false,
 			etag: response.headers['etag'],
@@ -124,7 +124,8 @@ async function getSchemaInternal(
 		return cachedData!.schema;
 	}
 
-	const schema = factory.makeSchema(result.rawSchema, { shouldRemoveDeletedTypesAndFields: true });
+	const schema = makeSchema(result.rawSchema!);
+
 	schemaCache.set(workspace, {
 		etag: result.etag,
 		schema,

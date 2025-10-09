@@ -6,6 +6,11 @@ export const databaseRLC: INodeProperties = {
 	name: 'database',
 	type: 'resourceLocator',
 	default: { mode: 'list', value: '' },
+	displayOptions: {
+		show: {
+			resource: ['entity'],
+		},
+	},
 	required: true,
 	modes: [
 		{
@@ -225,6 +230,7 @@ const fieldUIControls: INodeProperties[] = [
 	},
 	{
 		displayName: 'Field Value',
+		hint: 'Markdown is supported',
 		name: 'value',
 		type: 'string',
 		typeOptions: {

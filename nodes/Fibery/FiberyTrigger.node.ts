@@ -85,8 +85,6 @@ export class FiberyTrigger implements INodeType {
 				const webhookData = this.getWorkflowStaticData('node');
 				const { value: database } = this.getNodeParameter('database') as { value: string };
 
-				// Check all the webhooks which exist already if it is identical to the
-				// one that is supposed to get created.
 				const webhooks = await apiRequest.call(this, 'GET', `webhooks/v2`);
 
 				for (const webhook of webhooks) {

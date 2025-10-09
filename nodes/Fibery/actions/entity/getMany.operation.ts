@@ -1,4 +1,3 @@
-import { TypeObject } from '@fibery/schema';
 import { capitalCase } from 'change-case';
 import {
 	IDataObject,
@@ -261,7 +260,7 @@ const properties: INodeProperties[] = [
 		name: 'options',
 		type: 'collection',
 		default: {},
-		placeholder: 'Add Field',
+		placeholder: 'Add Option',
 		options: [
 			{
 				displayName: 'Download Files',
@@ -274,12 +273,7 @@ const properties: INodeProperties[] = [
 	},
 ];
 
-const getWhere = (
-	conditions: IDataObject[],
-	matchType: 'q/and' | 'q/or',
-	typeObject: TypeObject,
-	timezone: string,
-) => {
+const getWhere = (conditions: IDataObject[], matchType: 'q/and' | 'q/or', timezone: string) => {
 	const where: Array<unknown> = [];
 	const params: Record<string, unknown> = {};
 
@@ -334,10 +328,10 @@ export async function execute(
 
 			const typeObject = schema.typeObjectsByName[database];
 
-			const select = getFieldsSelect.call(this, i, typeObject);
+			const select = getFieldsSelect.call(this, i, typeObject, schema);
 			const { where, params } =
 				filterType === 'manual'
-					? getWhere(conditions, matchType, typeObject, timezone)
+					? getWhere(conditions, matchType, timezone)
 					: { where: undefined, params: {} };
 
 			const command = {

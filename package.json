@@ -52,10 +52,8 @@
 		"n8n-workflow": "*"
 	},
 	"dependencies": {
-		"@fibery/schema": "10.2.8",
 		"change-case": "5.4.4",
 		"lodash": "4.17.21",
-		"lru-cache": "11.2.1",
 		"moment-timezone": "0.6.0",
 		"uuid": "13.0.0"
 	},

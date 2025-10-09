@@ -1,7 +1,7 @@
-import { TypeObject } from '@fibery/schema';
 import { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { isCollabDoc } from '../helpers/schema';
 import { queryCollaborationDocuments } from '../transport';
+import { TypeObject } from '../helpers/schema-factory';
 
 export async function entitiesWithCollabDos(
 	this: IExecuteFunctions,

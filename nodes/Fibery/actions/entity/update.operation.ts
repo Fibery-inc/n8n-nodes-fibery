@@ -45,7 +45,7 @@ export async function execute(
 
 			const fieldValues = this.getNodeParameter('fields.field', i, []) as IDataObject[];
 
-			const { entity, collections } = buildEntityUpdate(fieldValues, typeObject, timezone);
+			const { entity, collections } = buildEntityUpdate(fieldValues, typeObject, schema, timezone);
 
 			const command = {
 				command: 'fibery.entity/update',
@@ -68,7 +68,7 @@ export async function execute(
 				await addCollectionItems.call(this, updatedEntityId, collections);
 			}
 
-			const select = getFieldsSelect.call(this, i, typeObject);
+			const select = getFieldsSelect.call(this, i, typeObject, schema);
 			const queryCmd = {
 				command: 'fibery.entity/query',
 				args: {

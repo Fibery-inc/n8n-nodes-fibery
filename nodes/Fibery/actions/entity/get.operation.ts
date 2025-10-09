@@ -27,7 +27,7 @@ const properties: INodeProperties[] = [
 		name: 'options',
 		type: 'collection',
 		default: {},
-		placeholder: 'Add Field',
+		placeholder: 'Add Option',
 		options: [
 			{
 				displayName: 'Download Files',
@@ -60,7 +60,7 @@ export async function execute(
 
 			const typeObject = schema.typeObjectsByName[database];
 
-			const select = getFieldsSelect.call(this, i, typeObject);
+			const select = getFieldsSelect.call(this, i, typeObject, schema);
 
 			const command = {
 				command: 'fibery.entity/query',

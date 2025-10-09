@@ -1,4 +1,3 @@
-import { FieldObject, TypeObject } from '@fibery/schema';
 import {
 	fiberyUrlName,
 	getSupportedFieldObjects,
@@ -8,20 +7,26 @@ import {
 	isSupportedField,
 } from '../helpers/schema';
 import { IExecuteFunctions } from 'n8n-workflow';
+import { FieldObject, Schema, TypeObject } from '../helpers/schema-factory';
 
 // fields that exist on every DB
 const getSimplifiedFields = (typeObject: TypeObject) => {
 	return [
-		typeObject.titleFieldObject,
-		typeObject.idFieldObject,
-		typeObject.publicIdFieldObject,
+		typeObject.fieldObjectsByName[typeObject.titleField],
+		typeObject.fieldObjectsByName[typeObject.idField],
+		typeObject.fieldObjectsByName[typeObject.publicIdField],
 		typeObject.fieldObjectsByName['fibery/created-by'],
 		typeObject.fieldObjectsByName['fibery/creation-date'],
 		typeObject.fieldObjectsByName['fibery/modification-date'],
 	];
 };
 
-export function getFieldsSelect(this: IExecuteFunctions, inputIdx: number, typeObject: TypeObject) {
+export function getFieldsSelect(
+	this: IExecuteFunctions,
+	inputIdx: number,
+	typeObject: TypeObject,
+	schema: Schema,
+) {
 	const output = this.getNodeParameter('output', inputIdx) as
 		| 'simplified'
 		| 'raw'
@@ -39,7 +44,10 @@ export function getFieldsSelect(this: IExecuteFunctions, inputIdx: number, typeO
 
 			const fieldObjects = selectedFields.flatMap((f) => {
 				return f === fiberyUrlName
-					? [typeObject.publicIdFieldObject, typeObject.titleFieldObject] // are required to build url
+					? [
+							typeObject.fieldObjectsByName[typeObject.publicIdField],
+							typeObject.fieldObjectsByName[typeObject.titleField],
+						] // are required to build url
 					: typeObject.fieldObjectsByName[f];
 			});
 
@@ -78,21 +86,21 @@ export function getFieldsSelect(this: IExecuteFunctions, inputIdx: number, typeO
 			return;
 		}
 
-		if (isSingleReferenceField(fieldObject)) {
+		if (isSingleReferenceField(fieldObject, schema)) {
 			select[fieldObject.name] = {
-				id: [fieldObject.name, fieldObject.typeObject.idField],
-				name: [fieldObject.name, fieldObject.typeObject.titleField],
+				id: [fieldObject.name, schema.typeObjectsByName[fieldObject.type].idField],
+				name: [fieldObject.name, schema.typeObjectsByName[fieldObject.type].titleField],
 			};
 			return;
 		}
 
-		if (isCollectionReferenceField(fieldObject)) {
+		if (isCollectionReferenceField(fieldObject, schema)) {
 			select[fieldObject.name] = {
 				'q/from': fieldObject.name,
 				'q/limit': 200,
 				'q/select': {
-					id: fieldObject.typeObject.idField,
-					name: fieldObject.typeObject.titleField,
+					id: schema.typeObjectsByName[fieldObject.type].idField,
+					name: schema.typeObjectsByName[fieldObject.type].titleField,
 				},
 			};
 			return;

@@ -1,4 +1,3 @@
-import { TypeObject } from '@fibery/schema';
 import {
 	IBinaryKeyData,
 	IDataObject,
@@ -7,6 +6,7 @@ import {
 	IPairedItemData,
 } from 'n8n-workflow';
 import { apiRequest } from '../transport';
+import { TypeObject } from '../helpers/schema-factory';
 
 export async function downloadEntityFiles(
 	this: IExecuteFunctions,

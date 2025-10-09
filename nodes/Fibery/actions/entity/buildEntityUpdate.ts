@@ -1,12 +1,13 @@
-import { TypeObject } from '@fibery/schema';
 import moment from 'moment-timezone';
 import { IDataObject } from 'n8n-workflow';
 import { isCollabDoc, isCollectionReferenceField, isSingleReferenceField } from '../helpers/schema';
 import { CollectionItem } from '../transport';
+import { Schema, TypeObject } from '../helpers/schema-factory';
 
 export const buildEntityUpdate = (
 	fieldValues: IDataObject[],
 	typeObject: TypeObject,
+	schema: Schema,
 	nodeTimezone: string,
 ) => {
 	const entity: Record<string, unknown> = {};
@@ -44,13 +45,13 @@ export const buildEntityUpdate = (
 					break;
 				}
 				default: {
-					if (isSingleReferenceField(fieldObject)) {
+					if (isSingleReferenceField(fieldObject, schema)) {
 						entity[name] = value
 							? {
-									[fieldObject.typeObject.idField]: value,
+									[schema.typeObjectsByName[fieldObject.type].idField]: value,
 								}
 							: null;
-					} else if (isCollectionReferenceField(fieldObject)) {
+					} else if (isCollectionReferenceField(fieldObject, schema)) {
 						collections.push({
 							field: name,
 							values: value as string[],
