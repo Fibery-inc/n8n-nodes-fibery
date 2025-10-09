@@ -8,6 +8,4 @@ dist
 # misc
 .DS_Store
 
-.github
-
 .env
