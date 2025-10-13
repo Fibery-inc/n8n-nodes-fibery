@@ -1,6 +1,6 @@
 {
 	"name": "@fibery/n8n-nodes-fibery",
-	"version": "0.1.7",
+	"version": "0.1.8",
 	"description": "n8n node for Fibery",
 	"license": "MIT",
 	"homepage": "https://github.com/Fibery-inc/n8n-nodes-fibery",
