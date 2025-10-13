@@ -75,14 +75,19 @@ export function getFieldsSelect(
 		}
 
 		if (fieldObject.type === 'fibery/file') {
-			select[fieldObject.name] = {
-				'q/from': [fieldObject.name],
-				'q/limit': 'q/no-limit',
-				'q/select': {
-					name: ['fibery/name'],
-					secret: ['fibery/secret'],
-				},
-			};
+			select[fieldObject.name] = isSingleReferenceField(fieldObject, schema)
+				? {
+						name: [fieldObject.name, 'fibery/name'],
+						secret: [fieldObject.name, 'fibery/secret'],
+					}
+				: {
+						'q/from': [fieldObject.name],
+						'q/limit': 'q/no-limit',
+						'q/select': {
+							name: ['fibery/name'],
+							secret: ['fibery/secret'],
+						},
+					};
 			return;
 		}
 

@@ -3,6 +3,14 @@ import { addEntityLink, fiberyUrlName } from '../helpers/schema';
 import { entitiesWithCollabDos } from './withCollabDocs';
 import { TypeObject } from '../helpers/schema-factory';
 
+type FileValue = { name: string; secret: string };
+
+function formatFileValue({ name, secret }: FileValue, baseUrl: string) {
+	return { name, url: encodeURI(`${baseUrl}/api/files/${secret}`) };
+}
+
+export type FormattedFileValue = { name: string; url: string };
+
 function transformFileFieldsToUrls(
 	entity: IDataObject,
 	typeObject: TypeObject,
@@ -10,10 +18,12 @@ function transformFileFieldsToUrls(
 ): IDataObject {
 	const fileFields = typeObject.fieldObjects.filter((f) => f.type === 'fibery/file');
 	fileFields.forEach((field) => {
-		if (entity[field.name]) {
-			entity[field.name] = (entity[field.name] as { name: string; secret: string }[]).map(
-				({ name, secret }) => ({ name, url: encodeURI(`${baseUrl}/api/files/${secret}`) }),
-			);
+		const value = entity[field.name] as FileValue | FileValue[];
+
+		if (value) {
+			entity[field.name] = Array.isArray(value)
+				? value.map((value) => formatFileValue(value, baseUrl))
+				: formatFileValue(value, baseUrl);
 		}
 	});
 

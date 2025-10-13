@@ -7,6 +7,7 @@ import {
 } from 'n8n-workflow';
 import { apiRequest } from '../transport';
 import { TypeObject } from '../helpers/schema-factory';
+import { FormattedFileValue } from './formatEntityToOutput';
 
 export async function downloadEntityFiles(
 	this: IExecuteFunctions,
@@ -27,8 +28,10 @@ export async function downloadEntityFiles(
 			element.pairedItems = pairedItem;
 		}
 		for (const key of fileFields) {
-			const files = entity[key] as { name: string; url: string }[];
-			if (files) {
+			const fileValue = entity[key] as FormattedFileValue | FormattedFileValue[];
+			if (fileValue) {
+				const files = Array.isArray(fileValue) ? fileValue : [fileValue];
+
 				for (const [index, file] of files.entries()) {
 					const data = await apiRequest.call(
 						this,
