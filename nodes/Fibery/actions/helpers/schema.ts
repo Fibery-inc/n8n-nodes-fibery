@@ -113,6 +113,8 @@ export const fiberyFieldToN8nControlType = (fieldObject: FieldObject, schema: Sc
 		case 'fibery/date-range':
 		case 'fibery/date-time-range':
 			return ControlTypes.dateRange;
+		case 'fibery/json-value':
+			return ControlTypes.json;
 
 		default: {
 			if (isSingleReferenceField(fieldObject, schema)) {

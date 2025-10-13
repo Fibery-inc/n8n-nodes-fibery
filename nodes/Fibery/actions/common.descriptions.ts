@@ -229,8 +229,7 @@ const fieldUIControls: INodeProperties[] = [
 		},
 	},
 	{
-		displayName: 'Field Value',
-		hint: 'Markdown is supported',
+		displayName: 'Field Value (Markdown)',
 		name: 'value',
 		type: 'string',
 		typeOptions: {
@@ -240,6 +239,17 @@ const fieldUIControls: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				type: [ControlTypes.textArea],
+			},
+		},
+	},
+	{
+		displayName: 'Field Value',
+		name: 'value',
+		type: 'json',
+		default: '',
+		displayOptions: {
+			show: {
+				type: [ControlTypes.json],
 			},
 		},
 	},
