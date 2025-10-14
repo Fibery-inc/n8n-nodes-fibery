@@ -327,14 +327,17 @@ export async function execute(
 				filterType === 'manual'
 					? (this.getNodeParameter('filters.conditions', i, []) as IDataObject[])
 					: [];
-			const matchType = this.getNodeParameter('matchType', i) as 'q/and' | 'q/or';
 
 			const typeObject = schema.typeObjectsByName[database];
 
 			const select = getFieldsSelect.call(this, i, typeObject, schema);
 			const { where, params } =
 				filterType === 'manual'
-					? getWhere(conditions, matchType, timezone)
+					? getWhere(
+							conditions,
+							this.getNodeParameter('matchType', i) as 'q/and' | 'q/or',
+							timezone,
+						)
 					: { where: undefined, params: {} };
 
 			const command = {
