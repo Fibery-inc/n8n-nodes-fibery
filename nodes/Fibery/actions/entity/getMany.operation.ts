@@ -323,7 +323,10 @@ export async function execute(
 		try {
 			const limit = this.getNodeParameter('limit', i, { extractValue: true }) as number;
 			const filterType = this.getNodeParameter('filterType', i) as string;
-			const conditions = this.getNodeParameter('filters.conditions', i, []) as IDataObject[];
+			const conditions =
+				filterType === 'manual'
+					? (this.getNodeParameter('filters.conditions', i, []) as IDataObject[])
+					: [];
 			const matchType = this.getNodeParameter('matchType', i) as 'q/and' | 'q/or';
 
 			const typeObject = schema.typeObjectsByName[database];
