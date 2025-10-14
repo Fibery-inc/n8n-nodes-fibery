@@ -162,7 +162,7 @@ export const operatorToCommand: {
 	'multi-select': {
 		contains: (field, param) => [[`q/in`, [field, 'fibery/id'], param]],
 		does_not_contain: (field, param) => [[`q/not-in`, [field, 'fibery/id'], param]],
-		is_empty: (field, param) => [['=', [`q/null-or-empty?`, field], param], true],
-		is_not_empty: (field, param) => [['=', [`q/null-or-empty?`, field], param], false],
+		is_empty: (field, param) => [['=', [`q/count`, [field, 'fibery/id']], param], 0],
+		is_not_empty: (field, param) => [['>', [`q/count`, [field, 'fibery/id']], param], 0],
 	},
 };
