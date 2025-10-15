@@ -92,7 +92,7 @@ const isObsoleteTitle = (str: string) => {
 	return name.toLowerCase() === name && !hasTildes(name);
 };
 const hasTildes = (str: string) => str.includes('~');
-const replaceTildes = (str: string) => (str || '').split('~').join(' ');
+const replaceTildes = (str: string) => str.split('~').join(' ');
 
 const nameOverrides: Record<string, string> = {
 	'fibery/type': 'fibery/Database',
@@ -101,13 +101,14 @@ const nameOverrides: Record<string, string> = {
 
 const capitalizeFirstChar = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-export const toTypeOrFieldTitle = (str: string) => {
-	return replaceTildes(capitalizeFirstChar(splitKeyword(str).name));
+const toTypeOrFieldTitle = (name: string) => {
+	return replaceTildes(capitalizeFirstChar(name));
 };
 
 export const toNonEnumTitle = (strName: string) => {
 	const str = nameOverrides[strName] || strName;
-	return isObsoleteTitle(str) ? pascalCase(str) : toTypeOrFieldTitle(str);
+	const { name } = splitKeyword(str);
+	return isObsoleteTitle(str) ? pascalCase(name) : toTypeOrFieldTitle(name);
 };
 
 const makeFieldObject = (rawField: RawField, { holderType }: { holderType: string }) => {

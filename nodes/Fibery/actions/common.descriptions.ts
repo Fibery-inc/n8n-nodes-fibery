@@ -122,6 +122,17 @@ const fieldUIControls: INodeProperties[] = [
 			},
 		},
 	},
+	{
+		displayName: 'Field Value',
+		name: 'value',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				type: [ControlTypes.number],
+			},
+		},
+	},
 
 	{
 		displayName: 'Checked',
