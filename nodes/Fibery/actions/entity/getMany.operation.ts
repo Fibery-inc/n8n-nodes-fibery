@@ -57,6 +57,20 @@ const fieldUIControls: INodeProperties[] = [
 		},
 	},
 	{
+		displayName: 'Field Value',
+		name: 'value',
+		type: 'number',
+		default: '',
+		displayOptions: {
+			show: {
+				type: [ControlTypes.number],
+			},
+			hide: {
+				operator: [operators.is_empty, operators.is_not_empty],
+			},
+		},
+	},
+	{
 		displayName: 'Checked',
 		name: 'value',
 		type: 'boolean',
