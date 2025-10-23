@@ -34,7 +34,7 @@ export async function execute(
 
 	const schema = await getSchema.call(this);
 
-	const typeObject = schema.typeObjectsByName[database];
+	const typeObject = schema.getTypeObjectByName(database);
 
 	for (let i = 0; i < items.length; i++) {
 		try {

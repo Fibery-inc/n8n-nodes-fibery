@@ -7,7 +7,7 @@ const getRelatedFieldObject = (fieldObject: FieldObject, schema: Schema) => {
 		return null;
 	}
 
-	const typeObject = schema.typeObjectsByName[fieldObject.type];
+	const typeObject = schema.getTypeObjectByName(fieldObject.type);
 
 	if (!fieldObject.relation && fieldObject.multiRelation && typeObject.isEntityRef) {
 		return null;
@@ -35,7 +35,7 @@ const getRelatedFieldObject = (fieldObject: FieldObject, schema: Schema) => {
 };
 
 const getCardinality = (fieldObject: FieldObject, schema: Schema) => {
-	const fieldTypeObject = schema.typeObjectsByName[fieldObject.type];
+	const fieldTypeObject = schema.getTypeObjectByName(fieldObject.type);
 	const relatedFieldObject = getRelatedFieldObject(fieldObject, schema);
 	const isCollection = fieldObject.isCollection;
 
@@ -65,7 +65,7 @@ const getCardinality = (fieldObject: FieldObject, schema: Schema) => {
 };
 
 export const isSingleReferenceField = (fieldObject: FieldObject, schema: Schema) => {
-	const fieldTypeObject = schema.typeObjectsByName[fieldObject.type];
+	const fieldTypeObject = schema.getTypeObjectByName(fieldObject.type);
 
 	if (fieldTypeObject.isPrimitive) {
 		return false;
@@ -79,7 +79,7 @@ export const isSingleReferenceField = (fieldObject: FieldObject, schema: Schema)
 };
 
 export const isCollectionReferenceField = (fieldObject: FieldObject, schema: Schema) => {
-	const fieldTypeObject = schema.typeObjectsByName[fieldObject.type];
+	const fieldTypeObject = schema.getTypeObjectByName(fieldObject.type);
 
 	if (fieldTypeObject.isPrimitive) {
 		return false;

@@ -20,7 +20,7 @@ export const buildEntityUpdate = (
 		if (typeof key === 'string' && key.length > 0) {
 			const { name } = JSON.parse(key);
 
-			const fieldObject = typeObject.fieldObjectsByName[name];
+			const fieldObject = typeObject.getFieldObjectByName(name);
 
 			switch (fieldObject.type) {
 				case 'fibery/bool': {
@@ -48,7 +48,7 @@ export const buildEntityUpdate = (
 					if (isSingleReferenceField(fieldObject, schema)) {
 						entity[name] = value
 							? {
-									[schema.typeObjectsByName[fieldObject.type].idField]: value,
+									[schema.getTypeObjectByName(fieldObject.type).idField]: value,
 								}
 							: null;
 					} else if (isCollectionReferenceField(fieldObject, schema)) {

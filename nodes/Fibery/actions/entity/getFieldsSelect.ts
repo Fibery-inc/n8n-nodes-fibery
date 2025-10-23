@@ -12,12 +12,12 @@ import { FieldObject, Schema, TypeObject } from '../helpers/schema-factory';
 // fields that exist on every DB
 const getSimplifiedFields = (typeObject: TypeObject) => {
 	return [
-		typeObject.fieldObjectsByName[typeObject.titleField],
-		typeObject.fieldObjectsByName[typeObject.idField],
-		typeObject.fieldObjectsByName[typeObject.publicIdField],
-		typeObject.fieldObjectsByName['fibery/created-by'],
-		typeObject.fieldObjectsByName['fibery/creation-date'],
-		typeObject.fieldObjectsByName['fibery/modification-date'],
+		typeObject.getFieldObjectByName(typeObject.titleField),
+		typeObject.getFieldObjectByName(typeObject.idField),
+		typeObject.getFieldObjectByName(typeObject.publicIdField),
+		typeObject.getFieldObjectByName('fibery/created-by'),
+		typeObject.getFieldObjectByName('fibery/creation-date'),
+		typeObject.getFieldObjectByName('fibery/modification-date'),
 	];
 };
 
@@ -45,10 +45,10 @@ export function getFieldsSelect(
 			const fieldObjects = selectedFields.flatMap((f) => {
 				return f === fiberyUrlName
 					? [
-							typeObject.fieldObjectsByName[typeObject.publicIdField],
-							typeObject.fieldObjectsByName[typeObject.titleField],
+							typeObject.getFieldObjectByName(typeObject.publicIdField),
+							typeObject.getFieldObjectByName(typeObject.titleField),
 						] // are required to build url
-					: typeObject.fieldObjectsByName[f];
+					: typeObject.getFieldObjectByName(f);
 			});
 
 			fieldsToSelect = new Set(fieldObjects);
@@ -93,8 +93,8 @@ export function getFieldsSelect(
 
 		if (isSingleReferenceField(fieldObject, schema)) {
 			select[fieldObject.name] = {
-				id: [fieldObject.name, schema.typeObjectsByName[fieldObject.type].idField],
-				name: [fieldObject.name, schema.typeObjectsByName[fieldObject.type].titleField],
+				id: [fieldObject.name, schema.getTypeObjectByName(fieldObject.type).idField],
+				name: [fieldObject.name, schema.getTypeObjectByName(fieldObject.type).titleField],
 			};
 			return;
 		}
@@ -104,8 +104,8 @@ export function getFieldsSelect(
 				'q/from': fieldObject.name,
 				'q/limit': 200,
 				'q/select': {
-					id: schema.typeObjectsByName[fieldObject.type].idField,
-					name: schema.typeObjectsByName[fieldObject.type].titleField,
+					id: schema.getTypeObjectByName(fieldObject.type).idField,
+					name: schema.getTypeObjectByName(fieldObject.type).titleField,
 				},
 			};
 			return;

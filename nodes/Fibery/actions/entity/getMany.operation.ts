@@ -342,7 +342,7 @@ export async function execute(
 					? (this.getNodeParameter('filters.conditions', i, []) as IDataObject[])
 					: [];
 
-			const typeObject = schema.typeObjectsByName[database];
+			const typeObject = schema.getTypeObjectByName(database);
 
 			const select = getFieldsSelect.call(this, i, typeObject, schema);
 			const { where, params } =

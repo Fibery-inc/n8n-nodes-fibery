@@ -1,10 +1,6 @@
-import {
-	ILoadOptionsFunctions,
-	INodeListSearchResult,
-	INodePropertyOptions,
-	NodeOperationError,
-} from 'n8n-workflow';
+import { ILoadOptionsFunctions, INodeListSearchResult, INodePropertyOptions } from 'n8n-workflow';
 import { executeSingleCommand, getSchema } from '../transport';
+import { getDatabaseParam } from './getDatabaseParam';
 
 export async function getDatabases(
 	this: ILoadOptionsFunctions,
@@ -35,20 +31,11 @@ export async function getEntities(
 	filter?: string,
 	paginationToken?: string,
 ): Promise<INodeListSearchResult> {
-	const database = this.getCurrentNodeParameter('database', {
-		extractValue: true,
-		ensureType: 'string',
-	}) as string;
-
-	if (!database) {
-		throw new NodeOperationError(this.getNode(), new Error('Database is required'), {
-			description: 'Please select a Database first',
-		});
-	}
+	const database = getDatabaseParam.call(this);
 
 	const schema = await getSchema.call(this);
 
-	const typeObject = schema.typeObjectsByName[database];
+	const typeObject = schema.getTypeObjectByName(database);
 
 	const pageLimit = 50;
 

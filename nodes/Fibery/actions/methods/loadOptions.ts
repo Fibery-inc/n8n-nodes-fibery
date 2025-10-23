@@ -7,15 +7,16 @@ import {
 	isSearchableField,
 	isWritableField,
 } from '../helpers/schema';
-import { executeSingleCommand, getSchema } from '../transport';
 import { FieldObject, Schema } from '../helpers/schema-factory';
+import { executeSingleCommand, getSchema } from '../transport';
+import { getDatabaseParam } from './getDatabaseParam';
 
 export async function loadFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const database = this.getCurrentNodeParameter('database', { extractValue: true }) as string;
+	const database = getDatabaseParam.call(this);
 
 	const schema = await getSchema.call(this);
 
-	const typeObject = schema.typeObjectsByName[database];
+	const typeObject = schema.getTypeObjectByName(database);
 
 	return getSupportedFieldObjects(typeObject)
 		.map((fieldObject) => ({
@@ -48,11 +49,11 @@ const sortFieldObjects = (a: FieldObject, b: FieldObject) => {
 export async function getWritableFields(
 	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
-	const database = this.getCurrentNodeParameter('database', { extractValue: true }) as string;
+	const database = getDatabaseParam.call(this);
 
 	const schema = await getSchema.call(this);
 
-	const typeObject = schema.typeObjectsByName[database];
+	const typeObject = schema.getTypeObjectByName(database);
 
 	const fieldObjects = typeObject.fieldObjects
 		.filter((fieldObject) => isWritableField(fieldObject, schema))
@@ -64,17 +65,19 @@ export async function getWritableFields(
 export async function getSelectOptions(
 	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
-	const database = this.getCurrentNodeParameter('database', { extractValue: true }) as string;
+	const database = getDatabaseParam.call(this);
+
 	const fieldKey = this.getCurrentNodeParameter('&key', { extractValue: true }) as string;
 
 	const field = JSON.parse(fieldKey).name;
 
 	const schema = await getSchema.call(this);
 
-	const typeObject = schema.typeObjectsByName[database];
-	const fieldObject = typeObject.fieldObjectsByName[field];
+	const typeObject = schema.getTypeObjectByName(database);
 
-	const fieldTypeObject = schema.typeObjectsByName[fieldObject.type];
+	const fieldObject = typeObject.getFieldObjectByName(field);
+
+	const fieldTypeObject = schema.getTypeObjectByName(fieldObject.type);
 
 	const command = {
 		command: 'fibery.entity/query',
@@ -117,11 +120,11 @@ export async function getTimezones(this: ILoadOptionsFunctions): Promise<INodePr
 export async function getSearchableFields(
 	this: ILoadOptionsFunctions,
 ): Promise<INodePropertyOptions[]> {
-	const database = this.getCurrentNodeParameter('database', { extractValue: true }) as string;
+	const database = getDatabaseParam.call(this);
 
 	const schema = await getSchema.call(this);
 
-	const typeObject = schema.typeObjectsByName[database];
+	const typeObject = schema.getTypeObjectByName(database);
 
 	const fieldObjects = typeObject.fieldObjects
 		.filter((fieldObject) => isSearchableField(fieldObject, schema))

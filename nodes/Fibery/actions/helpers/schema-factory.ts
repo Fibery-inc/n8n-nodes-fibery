@@ -175,6 +175,8 @@ const makeTypeObject = (rawType: RawType) => {
 			return fieldObject;
 		});
 
+	const fieldObjectsByName = keyBy(fieldObjects, (f) => f.name);
+
 	return {
 		id: rawType['fibery/id'],
 		name: rawType['fibery/name'],
@@ -182,7 +184,15 @@ const makeTypeObject = (rawType: RawType) => {
 		isDomain: rawMeta['fibery/domain?'] || false,
 		isPrimitive: rawMeta['fibery/primitive?'] || false,
 		fieldObjects,
-		fieldObjectsByName: keyBy(fieldObjects, (f) => f.name),
+		getFieldObjectByName(name: string) {
+			const fieldObject = fieldObjectsByName[name];
+
+			if (!fieldObject) {
+				throw new Error(`Field "${name}" not found in the database "${rawType['fibery/name']}"`);
+			}
+
+			return fieldObject;
+		},
 		isEntityRef: rawType['fibery/name'] === 'fibery/entity-ref',
 		installedMixins,
 		...fieldShortcuts,
@@ -197,7 +207,21 @@ export const makeSchema = (rawSchema: RawSchema) => {
 		.filter((rawType) => rawType['fibery/deleted?'] !== true)
 		.map(makeTypeObject);
 
-	return { ...schemaRest, typeObjects, typeObjectsByName: keyBy(typeObjects, (t) => t.name) };
+	const typeObjectsByName = keyBy(typeObjects, (t) => t.name);
+
+	return {
+		...schemaRest,
+		typeObjects,
+		getTypeObjectByName(name: string) {
+			const typeObject = typeObjectsByName[name];
+
+			if (!typeObject) {
+				throw new Error(`Database "${name}" not found in the schema`);
+			}
+
+			return typeObject;
+		},
+	};
 };
 
 export type Schema = ReturnType<typeof makeSchema>;

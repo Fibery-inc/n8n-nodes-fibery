@@ -58,7 +58,7 @@ export async function execute(
 				i,
 			) as INodeParameterResourceLocator;
 
-			const typeObject = schema.typeObjectsByName[database];
+			const typeObject = schema.getTypeObjectByName(database);
 
 			const select = getFieldsSelect.call(this, i, typeObject, schema);
 
