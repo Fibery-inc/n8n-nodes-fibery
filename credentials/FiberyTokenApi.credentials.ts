@@ -1,4 +1,9 @@
-import type { IAuthenticateGeneric, ICredentialType, INodeProperties } from 'n8n-workflow';
+import type {
+	IAuthenticateGeneric,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+} from 'n8n-workflow';
 
 export class FiberyTokenApi implements ICredentialType {
 	name = 'fiberyTokenApi';
@@ -30,6 +35,16 @@ export class FiberyTokenApi implements ICredentialType {
 		properties: {
 			headers: {
 				Authorization: '=Bearer {{$credentials.apiKey}}',
+			},
+		},
+	};
+
+	test: ICredentialTestRequest = {
+		request: {
+			url: '=https://{{$credentials.workspace}}.fibery.io/api/schema',
+			method: 'GET',
+			headers: {
+				'User-Agent': 'n8n-fibery-node',
 			},
 		},
 	};
