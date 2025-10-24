@@ -2,6 +2,7 @@ import { IDataObject, IExecuteFunctions } from 'n8n-workflow';
 import { addEntityLink, fiberyUrlName } from '../helpers/schema';
 import { entitiesWithCollabDos } from './withCollabDocs';
 import { TypeObject } from '../helpers/schema-factory';
+import { getBaseUrl } from '../transport';
 
 type FileValue = { name: string; secret: string };
 
@@ -52,13 +53,14 @@ function formatEntity(
 	}
 }
 
-export function formatEntitiesOutput(
+export async function formatEntitiesOutput(
 	this: IExecuteFunctions,
 	inputIdx: number,
 	entities: IDataObject[],
 	typeObject: TypeObject,
-	baseUrl: string,
 ) {
+	const baseUrl = await getBaseUrl.call(this);
+
 	const output = this.getNodeParameter('output', inputIdx) as
 		| 'simplified'
 		| 'raw'

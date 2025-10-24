@@ -9,7 +9,7 @@ import {
 	NodeApiError,
 } from 'n8n-workflow';
 import { LRUCache } from '../helpers/lru-cache';
-import { makeSchema, RawSchema, Schema } from '../helpers/schema-factory';
+import { makeSchema, RawSchema, Schema, TypeObject } from '../helpers/schema-factory';
 
 const schemaCache = new LRUCache<{ etag: string; schema: Schema }>({
 	maxSize: 100,
@@ -198,6 +198,46 @@ export async function createEntity(
 	return createdEntity;
 }
 
+export async function updateEntity(
+	this: IExecuteFunctions,
+	typeName: string,
+	id: string,
+	entity: Record<string, unknown>,
+	select: Record<string, unknown>,
+) {
+	const [
+		,
+		{
+			result: [updatedEntity],
+		},
+	] = await executeBatchCommands.call(this, [
+		{
+			command: 'fibery.entity/update',
+			args: {
+				type: typeName,
+				entity: {
+					'fibery/id': id,
+					...entity,
+				},
+			},
+		},
+		{
+			command: 'fibery.entity/query',
+			args: {
+				query: {
+					'q/from': typeName,
+					'q/select': select,
+					'q/where': ['=', ['fibery/id'], '$entityId'],
+					'q/limit': 1,
+				},
+				params: { $entityId: id },
+			},
+		},
+	]);
+
+	return updatedEntity;
+}
+
 export type CollectionItem = {
 	field: string;
 	values: string[];
@@ -221,6 +261,59 @@ export async function addCollectionItems(
 
 	if (addCollectionItemsCommands.length > 0) {
 		await executeBatchCommands.call(this, addCollectionItemsCommands);
+	}
+}
+
+export async function mergeCollectionItems(
+	this: IExecuteFunctions,
+	collections: CollectionItem[],
+	entity: IDataObject,
+	typeObject: TypeObject,
+) {
+	const commands = collections.flatMap((collection) => {
+		const commands = [];
+
+		const currentValues = ((entity[collection.field] as { id: string }[]) || []).map((v) => v.id);
+		const currentValuesSet = new Set(currentValues);
+
+		const newValues = collection.values.filter((v) => !currentValuesSet.has(v));
+
+		if (newValues.length > 0) {
+			commands.push({
+				command: `fibery.entity/add-collection-items`,
+				args: {
+					entity: {
+						'fibery/id': entity[typeObject.idField],
+					},
+					field: collection.field,
+					items: newValues.map((v) => ({ 'fibery/id': v })),
+					type: collection.type,
+				},
+			});
+		}
+
+		const valuesSet = new Set(collection.values);
+		const removeValues = currentValues.filter((v) => !valuesSet.has(v));
+
+		if (removeValues.length > 0) {
+			commands.push({
+				command: `fibery.entity/remove-collection-items`,
+				args: {
+					entity: {
+						'fibery/id': entity[typeObject.idField],
+					},
+					field: collection.field,
+					items: removeValues.map((v) => ({ 'fibery/id': v })),
+					type: collection.type,
+				},
+			});
+		}
+
+		return commands;
+	});
+
+	if (commands.length > 0) {
+		await executeBatchCommands.call(this, commands);
 	}
 }
 

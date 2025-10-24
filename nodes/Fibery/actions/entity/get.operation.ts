@@ -7,10 +7,10 @@ import {
 } from 'n8n-workflow';
 import { entityOutput, entityRLC } from '../common.descriptions';
 import { prepareFiberyError } from '../helpers/utils';
-import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
-import { formatEntitiesOutput } from './formatEntityToOutput';
-import { getFieldsSelect } from './getFieldsSelect';
+import { executeSingleCommand, getSchema } from '../transport';
 import { downloadEntityFiles } from './downloadEntityFiles';
+import { formatEntitiesOutput } from './formatEntityToOutput';
+import { getSelectForEntityOutput } from './getSelectForEntityOutput';
 
 const displayOptions = {
 	show: {
@@ -60,7 +60,7 @@ export async function execute(
 
 			const typeObject = schema.getTypeObjectByName(database);
 
-			const select = getFieldsSelect.call(this, i, typeObject, schema);
+			const select = getSelectForEntityOutput.call(this, i, typeObject, schema);
 
 			const command = {
 				command: 'fibery.entity/query',
@@ -77,12 +77,9 @@ export async function execute(
 					},
 				},
 			};
-			const [responseData, baseUrl] = await Promise.all([
-				executeSingleCommand.call(this, command),
-				getBaseUrl.call(this),
-			]);
+			const responseData = await executeSingleCommand.call(this, command);
 
-			const data = await formatEntitiesOutput.call(this, i, responseData, typeObject, baseUrl);
+			const data = await formatEntitiesOutput.call(this, i, responseData, typeObject);
 
 			const options = this.getNodeParameter('options', i);
 

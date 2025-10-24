@@ -9,10 +9,10 @@ import { entityOutput } from '../common.descriptions';
 import { ControlType, ControlTypes } from '../constants';
 import { Operator, operators, operatorsPerControl, operatorToCommand } from '../helpers/search';
 import { prepareFiberyError } from '../helpers/utils';
-import { executeSingleCommand, getBaseUrl, getSchema } from '../transport';
-import { formatEntitiesOutput } from './formatEntityToOutput';
-import { getFieldsSelect } from './getFieldsSelect';
+import { executeSingleCommand, getSchema } from '../transport';
 import { downloadEntityFiles } from './downloadEntityFiles';
+import { formatEntitiesOutput } from './formatEntityToOutput';
+import { getSelectForEntityOutput } from './getSelectForEntityOutput';
 
 const capitaliseOperator = (str: string) =>
 	str
@@ -349,7 +349,7 @@ export async function execute(
 
 			const typeObject = schema.getTypeObjectByName(database);
 
-			const select = getFieldsSelect.call(this, i, typeObject, schema);
+			const select = getSelectForEntityOutput.call(this, i, typeObject, schema);
 			const { where, params } =
 				filterType === 'manual'
 					? getWhere(
@@ -374,12 +374,9 @@ export async function execute(
 					},
 				},
 			};
-			const [responseData, baseUrl] = await Promise.all([
-				executeSingleCommand.call(this, command),
-				getBaseUrl.call(this),
-			]);
+			const responseData = await executeSingleCommand.call(this, command);
 
-			const data = await formatEntitiesOutput.call(this, i, responseData, typeObject, baseUrl);
+			const data = await formatEntitiesOutput.call(this, i, responseData, typeObject);
 
 			const options = this.getNodeParameter('options', i);
 

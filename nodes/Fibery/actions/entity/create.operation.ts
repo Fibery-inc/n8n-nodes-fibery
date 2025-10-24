@@ -11,12 +11,12 @@ import {
 	addCollectionItems,
 	createEntity,
 	executeSingleCommand,
-	getBaseUrl,
 	getSchema,
 	updateCollaborationDocuments,
 } from '../transport';
 import { buildEntityUpdate } from './buildEntityUpdate';
 import { formatEntitiesOutput } from './formatEntityToOutput';
+import { getSelectForEntityOutput } from './getSelectForEntityOutput';
 import { getFieldsSelect } from './getFieldsSelect';
 import { isCollabDoc } from '../helpers/schema';
 
@@ -54,23 +54,12 @@ export async function execute(
 				timezone,
 			);
 
-			const docSecretsSelect = typeObject.fieldObjects.reduce(
-				(acc, fieldObject) => {
-					if (isCollabDoc(fieldObject)) {
-						acc[fieldObject.name] = [fieldObject.name, 'Collaboration~Documents/secret'];
-					}
-					return acc;
-				},
-				{} as Record<string, unknown>,
+			const docSecretsSelect = getFieldsSelect(
+				typeObject.fieldObjects.filter((f) => f.isId || isCollabDoc(f)),
+				schema,
 			);
 
-			const [responseData, baseUrl] = await Promise.all([
-				createEntity.call(this, database, entity, {
-					[typeObject.idField]: typeObject.idField,
-					...docSecretsSelect,
-				}),
-				getBaseUrl.call(this),
-			]);
+			const responseData = await createEntity.call(this, database, entity, docSecretsSelect);
 
 			const entityId = responseData[typeObject.idField] as string;
 
@@ -79,7 +68,7 @@ export async function execute(
 				updateCollaborationDocuments.call(this, collabDocs, responseData),
 			]);
 
-			const select = getFieldsSelect.call(this, i, typeObject, schema);
+			const select = getSelectForEntityOutput.call(this, i, typeObject, schema);
 			const queryCmd = {
 				command: 'fibery.entity/query',
 				args: {
@@ -98,7 +87,7 @@ export async function execute(
 
 			const createdEntities = await executeSingleCommand.call(this, queryCmd);
 
-			const data = await formatEntitiesOutput.call(this, i, createdEntities, typeObject, baseUrl);
+			const data = await formatEntitiesOutput.call(this, i, createdEntities, typeObject);
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),

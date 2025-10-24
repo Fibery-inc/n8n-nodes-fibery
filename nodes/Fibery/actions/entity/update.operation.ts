@@ -2,16 +2,23 @@ import {
 	IDataObject,
 	IExecuteFunctions,
 	INodeExecutionData,
-	INodeParameterResourceLocator,
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
 import { entityInput, entityOutput, entityRLC } from '../common.descriptions';
+import { isCollabDoc, isCollectionReferenceField } from '../helpers/schema';
 import { prepareFiberyError } from '../helpers/utils';
-import { addCollectionItems, executeSingleCommand, getBaseUrl, getSchema } from '../transport';
+import {
+	executeSingleCommand,
+	getSchema,
+	mergeCollectionItems,
+	updateCollaborationDocuments,
+	updateEntity,
+} from '../transport';
 import { buildEntityUpdate } from './buildEntityUpdate';
 import { formatEntitiesOutput } from './formatEntityToOutput';
 import { getFieldsSelect } from './getFieldsSelect';
+import { getSelectForEntityOutput } from './getSelectForEntityOutput';
 
 const displayOptions = {
 	show: {
@@ -38,37 +45,38 @@ export async function execute(
 
 	for (let i = 0; i < items.length; i++) {
 		try {
-			const { value: entityId } = this.getNodeParameter(
-				'entity',
-				i,
-			) as INodeParameterResourceLocator;
+			const { value: entityId } = this.getNodeParameter('entity', i) as { value: string };
 
 			const fieldValues = this.getNodeParameter('fields.field', i, []) as IDataObject[];
 
-			const { entity, collections } = buildEntityUpdate(fieldValues, typeObject, schema, timezone);
+			const { entity, collections, collabDocs } = buildEntityUpdate(
+				fieldValues,
+				typeObject,
+				schema,
+				timezone,
+			);
 
-			const command = {
-				command: 'fibery.entity/update',
-				args: {
-					type: database,
-					entity: {
-						[typeObject.idField]: entityId,
-						...entity,
-					},
-				},
-			};
+			const docSecretsAndCollectionsSelect = getFieldsSelect(
+				typeObject.fieldObjects.filter(
+					(f) => f.isId || isCollabDoc(f) || isCollectionReferenceField(f, schema),
+				),
+				schema,
+			);
 
-			const [responseData, baseUrl] = await Promise.all([
-				executeSingleCommand.call(this, command),
-				getBaseUrl.call(this),
+			const responseData = await updateEntity.call(
+				this,
+				database,
+				entityId,
+				entity,
+				docSecretsAndCollectionsSelect,
+			);
+
+			await Promise.all([
+				mergeCollectionItems.call(this, collections, responseData, typeObject),
+				updateCollaborationDocuments.call(this, collabDocs, responseData),
 			]);
 
-			if (collections.length > 0) {
-				const updatedEntityId = responseData[typeObject.idField] as string;
-				await addCollectionItems.call(this, updatedEntityId, collections);
-			}
-
-			const select = getFieldsSelect.call(this, i, typeObject, schema);
+			const select = getSelectForEntityOutput.call(this, i, typeObject, schema);
 			const queryCmd = {
 				command: 'fibery.entity/query',
 				args: {
@@ -87,7 +95,7 @@ export async function execute(
 
 			const updatedEntities = await executeSingleCommand.call(this, queryCmd);
 
-			const data = await formatEntitiesOutput.call(this, i, updatedEntities, typeObject, baseUrl);
+			const data = await formatEntitiesOutput.call(this, i, updatedEntities, typeObject);
 
 			const executionData = this.helpers.constructExecutionMetaData(
 				this.helpers.returnJsonArray(data),
