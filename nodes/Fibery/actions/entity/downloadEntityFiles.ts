@@ -39,7 +39,7 @@ export async function downloadEntityFiles(
 						`files/${file.url.split('/').pop()}`,
 						undefined,
 						undefined,
-						{ json: false, encoding: null },
+						{ json: false, encoding: 'arraybuffer' },
 					);
 					element.binary![`${key}_${index}`] = await this.helpers.prepareBinaryData(data as Buffer);
 				}

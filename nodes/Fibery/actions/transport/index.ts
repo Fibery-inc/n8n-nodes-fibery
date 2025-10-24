@@ -3,9 +3,9 @@ import {
 	IExecuteFunctions,
 	IHookFunctions,
 	IHttpRequestMethods,
+	IHttpRequestOptions,
 	ILoadOptionsFunctions,
 	IPollFunctions,
-	IRequestOptions,
 	NodeApiError,
 } from 'n8n-workflow';
 import { LRUCache } from '../helpers/lru-cache';
@@ -31,26 +31,26 @@ export async function apiRequest(
 	method: IHttpRequestMethods,
 	endpoint: string,
 	body: IDataObject | IDataObject[] | undefined = undefined,
-	headers: IRequestOptions['headers'] = {},
-	options: IRequestOptions = {},
+	headers: IHttpRequestOptions['headers'] = {},
+	options: Omit<IHttpRequestOptions, 'url'> = {},
 ) {
 	const authenticationMethod = this.getNodeParameter('authentication', 0) as string;
 
 	const baseUrl = await getBaseUrl.call(this);
 
-	const finalOptions: IRequestOptions = {
+	const finalOptions: IHttpRequestOptions = {
 		headers: {
 			'User-Agent': 'n8n-fibery-node',
 			...headers,
 		},
 		method,
 		body,
-		uri: `${baseUrl}/api/${endpoint}`,
+		url: `${baseUrl}/api/${endpoint}`,
 		json: true,
 		...options,
 	};
 
-	return await this.helpers.requestWithAuthentication.call(
+	return await this.helpers.httpRequestWithAuthentication.call(
 		this,
 		authenticationMethod,
 		finalOptions,
@@ -91,7 +91,7 @@ async function getRawSchema(
 
 	try {
 		const response = await apiRequest.call(this, 'GET', 'schema', undefined, headers, {
-			resolveWithFullResponse: true,
+			returnFullResponse: true,
 		});
 
 		const rawSchema = response.body as RawSchema;
