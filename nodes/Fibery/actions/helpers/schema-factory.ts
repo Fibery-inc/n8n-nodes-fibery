@@ -3,8 +3,7 @@
  * latest update from 10.2.8
  */
 
-import { pascalCase } from 'change-case';
-import { keyBy } from 'lodash';
+import { keyBy } from './utils';
 
 export type RawField = {
 	'fibery/id': string;
@@ -70,6 +69,15 @@ export type RawSchema = {
 	'fibery/id': string;
 };
 
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+
+const pascalCase = (str = '') => {
+	const parts = str.split('/');
+	const name = parts[parts.length - 1] || '';
+
+	return name.split('-').map(capitalize).join(' ');
+};
+
 const splitKeyword = (keyword: string) => {
 	const str = keyword || '';
 	const index = str.indexOf('/');
@@ -99,10 +107,8 @@ const nameOverrides: Record<string, string> = {
 	'fibery/app': 'fibery/Space',
 };
 
-const capitalizeFirstChar = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
-
 const toTypeOrFieldTitle = (name: string) => {
-	return replaceTildes(capitalizeFirstChar(name));
+	return replaceTildes(capitalize(name));
 };
 
 export const toNonEnumTitle = (strName: string) => {

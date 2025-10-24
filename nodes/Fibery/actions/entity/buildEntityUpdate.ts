@@ -1,8 +1,8 @@
-import moment from 'moment-timezone';
 import { IDataObject } from 'n8n-workflow';
 import { isCollabDoc, isCollectionReferenceField, isSingleReferenceField } from '../helpers/schema';
-import { CollectionItem } from '../transport';
 import { Schema, TypeObject } from '../helpers/schema-factory';
+import { convertTimeZone } from '../helpers/timezones';
+import { CollectionItem } from '../transport';
 
 export const buildEntityUpdate = (
 	fieldValues: IDataObject[],
@@ -30,18 +30,19 @@ export const buildEntityUpdate = (
 				case 'fibery/date-time-range':
 				case 'fibery/date-range': {
 					const timezoneValue = timezone === 'default' ? nodeTimezone : (timezone as string);
-
 					entity[name] = {
-						start: moment.tz(valueStart as string, timezoneValue).toISOString(),
-						end: moment.tz(valueEnd as string, timezoneValue).toISOString(),
+						start: convertTimeZone(new Date(valueStart as string), timezoneValue).toISOString(),
+						end: convertTimeZone(new Date(valueEnd as string), timezoneValue).toISOString(),
 					};
 					break;
 				}
-				case 'fibery/datetime':
+				case 'fibery/date-time':
 				case 'fibery/date': {
 					const timezoneValue = timezone === 'default' ? nodeTimezone : (timezone as string);
 
-					entity[name] = moment.tz(value as string, timezoneValue).toISOString();
+					const date = convertTimeZone(new Date(value as string), timezoneValue).toISOString();
+
+					entity[name] = date;
 					break;
 				}
 				default: {

@@ -41,9 +41,7 @@
 	},
 	"devDependencies": {
 		"@n8n/node-cli": "*",
-		"@types/lodash": "4.17.20",
 		"@types/node": "24.7.0",
-		"@types/uuid": "^10.0.0",
 		"eslint": "9.32.0",
 		"prettier": "3.6.2",
 		"release-it": "^19.0.4",
@@ -52,12 +50,7 @@
 	"peerDependencies": {
 		"n8n-workflow": "*"
 	},
-	"dependencies": {
-		"change-case": "4.1.2",
-		"lodash": "4.17.21",
-		"moment-timezone": "0.5.48",
-		"uuid": "10.0.0"
-	},
+	"dependencies": {},
 	"publishConfig": {
 		"access": "public"
 	}

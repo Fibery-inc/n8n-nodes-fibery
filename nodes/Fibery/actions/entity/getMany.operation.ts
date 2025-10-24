@@ -1,4 +1,3 @@
-import { capitalCase } from 'change-case';
 import {
 	IDataObject,
 	IExecuteFunctions,
@@ -15,12 +14,18 @@ import { formatEntitiesOutput } from './formatEntityToOutput';
 import { getFieldsSelect } from './getFieldsSelect';
 import { downloadEntityFiles } from './downloadEntityFiles';
 
+const capitaliseOperator = (str: string) =>
+	str
+		.split('_')
+		.map((str) => str.charAt(0).toUpperCase() + str.slice(1).toLowerCase())
+		.join(' ');
+
 const getFilterOperators = () => {
 	const elements: INodeProperties[] = [];
 
 	for (const [controlType, operators] of Object.entries(operatorsPerControl)) {
 		const options = operators.map((entry: string) => ({
-			name: capitalCase(entry),
+			name: capitaliseOperator(entry),
 			value: entry,
 		}));
 

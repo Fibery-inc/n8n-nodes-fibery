@@ -1,4 +1,3 @@
-import moment from 'moment-timezone';
 import { ILoadOptionsFunctions, INodePropertyOptions } from 'n8n-workflow';
 import {
 	fiberyFieldToN8nControlType,
@@ -10,6 +9,7 @@ import {
 import { FieldObject, Schema } from '../helpers/schema-factory';
 import { executeSingleCommand, getSchema } from '../transport';
 import { getDatabaseParam } from './getDatabaseParam';
+import { timezones } from '../helpers/timezones';
 
 export async function loadFields(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
 	const database = getDatabaseParam.call(this);
@@ -100,20 +100,19 @@ export async function getSelectOptions(
 }
 
 export async function getTimezones(this: ILoadOptionsFunctions): Promise<INodePropertyOptions[]> {
-	const returnData: INodePropertyOptions[] = [];
-	for (const timezone of moment.tz.names()) {
-		const timezoneName = timezone;
-		const timezoneId = timezone;
-		returnData.push({
-			name: timezoneName,
-			value: timezoneId,
-		});
-	}
-	returnData.unshift({
-		name: 'Default',
-		value: 'default',
-		description: 'Timezone set in n8n',
-	});
+	const returnData: INodePropertyOptions[] = [
+		{
+			name: 'Default',
+			value: 'default',
+			description: 'Timezone set in n8n',
+		} as INodePropertyOptions,
+	].concat(
+		timezones.map<INodePropertyOptions>((timezone) => ({
+			name: timezone,
+			value: timezone,
+		})),
+	);
+
 	return returnData;
 }
 

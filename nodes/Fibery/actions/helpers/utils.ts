@@ -1,5 +1,4 @@
 import { INode, IPairedItemData, NodeApiError, NodeOperationError } from 'n8n-workflow';
-import set from 'lodash/set';
 
 export function generatePairedItemData(length: number): IPairedItemData[] {
 	return Array.from({ length }, (_, item) => ({
@@ -9,14 +8,22 @@ export function generatePairedItemData(length: number): IPairedItemData[] {
 
 export const prepareFiberyError = (node: INode, error: Error, itemIndex: number) => {
 	if (error instanceof NodeApiError) {
-		set(error, 'context.itemIndex', itemIndex);
+		error.context.itemIndex = itemIndex;
 		return error;
 	}
 
-	if (error instanceof NodeOperationError && error?.context?.itemIndex === undefined) {
-		set(error, 'context.itemIndex', itemIndex);
+	if (error instanceof NodeOperationError && error.context.itemIndex === undefined) {
+		error.context.itemIndex = itemIndex;
 		return error;
 	}
 
 	return new NodeOperationError(node, error, { itemIndex });
+};
+
+export const keyBy = <T>(array: T[], key: (item: T) => string): Record<string, T> => {
+	const result: Record<string, T> = {};
+	for (const item of array) {
+		result[key(item)] = item;
+	}
+	return result;
 };

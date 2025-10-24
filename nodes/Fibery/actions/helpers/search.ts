@@ -1,4 +1,3 @@
-import moment from 'moment-timezone';
 import { ControlType, ControlTypes } from '../constants';
 
 export const operators = {
@@ -119,31 +118,25 @@ export const operatorToCommand: {
 	date: {
 		is: (field, param, { datePart, value }) => [
 			['=', wrapDateRange(field, datePart), param],
-			moment.tz(value as string).toISOString(),
+			new Date(value as string).toISOString(),
 		],
 		is_before: (field, param, { datePart, value }) => [
 			['<', wrapDateRange(field, datePart), param],
-			moment.tz(value as string).toISOString(),
+			new Date(value as string).toISOString(),
 		],
 		is_after: (field, param, { datePart, value }) => [
 			['>', wrapDateRange(field, datePart), param],
-			moment.tz(value as string).toISOString(),
+			new Date(value as string).toISOString(),
 		],
 		is_on_or_before: (field, param, { datePart, value }) => [
 			['<=', wrapDateRange(field, datePart), param],
-			moment.tz(value as string).toISOString(),
+			new Date(value as string).toISOString(),
 		],
 		is_on_or_after: (field, param, { datePart, value }) => [
 			['>=', wrapDateRange(field, datePart), param],
-			moment.tz(value as string).toISOString(),
+			new Date(value as string).toISOString(),
 		],
-		// today: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
-		// yesterday: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
-		// tomorrow: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
-		// this_week: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
-		// last_week: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
-		// this_month: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
-		// last_month: (field, param, {timezone}) => [['=', field, param], moment.tz(timezone).format('YYYY-MM-DD')],
+		// TODO: maybe add today, yesterday, tomorrow, this_week, last_week, this_month, last_month
 		is_empty: (field, param, { datePart }) => [
 			['=', [`q/null?`, wrapDateRange(field, datePart)], param],
 			true,

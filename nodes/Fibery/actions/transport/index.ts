@@ -8,7 +8,6 @@ import {
 	IRequestOptions,
 	NodeApiError,
 } from 'n8n-workflow';
-import { v7 } from 'uuid';
 import { LRUCache } from '../helpers/lru-cache';
 import { makeSchema, RawSchema, Schema } from '../helpers/schema-factory';
 
@@ -164,7 +163,7 @@ export async function createEntity(
 	entity: Record<string, unknown>,
 	select: Record<string, unknown>,
 ) {
-	const id = v7();
+	const id = crypto.randomUUID();
 
 	const [
 		,
