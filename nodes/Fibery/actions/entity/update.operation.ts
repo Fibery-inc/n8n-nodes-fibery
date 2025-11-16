@@ -5,7 +5,7 @@ import {
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
-import { entityInput, entityOutput, entityRLC } from '../common.descriptions';
+import { entityOutput, entityRLC } from '../common.descriptions';
 import { isCollabDoc, isCollectionReferenceField } from '../helpers/schema';
 import { prepareFiberyError } from '../helpers/utils';
 import {
@@ -27,7 +27,34 @@ const displayOptions = {
 	},
 };
 
-const properties: INodeProperties[] = [entityRLC, ...entityOutput, ...entityInput];
+const properties: INodeProperties[] = [
+	entityRLC,
+	...entityOutput,
+	{
+		displayName: 'Fields',
+		name: 'fields',
+		type: 'resourceMapper',
+		noDataExpression: true,
+		default: {
+			mappingMode: 'defineBelow',
+			value: null,
+		},
+		required: true,
+		typeOptions: {
+			loadOptionsDependsOn: ['database.value'],
+			resourceMapper: {
+				resourceMapperMethod: 'getFields',
+				mode: 'add',
+				fieldWords: {
+					singular: 'field',
+					plural: 'fields',
+				},
+				addAllFields: true,
+				multiKeyMatch: false,
+			},
+		},
+	},
+];
 
 export const description = updateDisplayOptions(displayOptions, properties);
 
@@ -43,13 +70,36 @@ export async function execute(
 
 	const typeObject = schema.getTypeObjectByName(database);
 
+	const dataMode = this.getNodeParameter('fields.mappingMode', 0) as string;
+
 	for (let i = 0; i < items.length; i++) {
 		try {
-			const { value: entityId } = this.getNodeParameter('entity', i) as { value: string };
+			let fieldValues: IDataObject;
+			let entityId: string;
 
-			const fieldValues = this.getNodeParameter('fields.field', i, []) as IDataObject[];
+			if (dataMode === 'autoMapInputData') {
+				// Use the input item's JSON data directly
+				fieldValues = items[i].json;
+				// Extract entity ID from the data
+				entityId = fieldValues[typeObject.idField] as string;
+				if (!entityId) {
+					throw new Error(`Entity ID field '${typeObject.idField}' not found in input data`);
+				}
+				// Remove entity ID from fields to avoid trying to update it
+				const { [typeObject.idField]: _, ...fieldsToUpdate } = fieldValues;
+				fieldValues = fieldsToUpdate;
+			} else {
+				// Get entity ID from the entity selector
+				const entityRLCValue = this.getNodeParameter('entity', i) as { value: string };
+				entityId = entityRLCValue.value;
 
-			const { entity, collections, collabDocs } = buildEntityUpdate(
+				// Get the mapped fields from the resourceMapper (doesn't include entity ID)
+				fieldValues = this.getNodeParameter('fields.value', i, {}) as IDataObject;
+			}
+
+			// Build entity update from fields (includes all field types)
+			const { entity, collections, collabDocs } = await buildEntityUpdate(
+				this,
 				fieldValues,
 				typeObject,
 				schema,
