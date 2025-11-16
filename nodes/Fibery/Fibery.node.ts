@@ -9,6 +9,7 @@ import * as database from './actions/database/Database.resource';
 import * as entity from './actions/entity/Entity.resource';
 import * as listSearch from './actions/methods/listSearch';
 import * as loadOptions from './actions/methods/loadOptions';
+import * as resourceMapping from './actions/methods/resourceMapping';
 
 export class Fibery implements INodeType {
 	description: INodeTypeDescription = {
@@ -86,6 +87,7 @@ export class Fibery implements INodeType {
 	methods = {
 		listSearch,
 		loadOptions,
+		resourceMapping,
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
