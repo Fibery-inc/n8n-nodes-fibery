@@ -6,6 +6,7 @@ import {
 	IHttpRequestOptions,
 	ILoadOptionsFunctions,
 	IPollFunctions,
+	JsonObject,
 	NodeApiError,
 } from 'n8n-workflow';
 import { LRUCache } from '../helpers/lru-cache';
@@ -108,7 +109,7 @@ async function getRawSchema(
 			};
 		}
 
-		throw error;
+		throw new NodeApiError(this.getNode(), error as JsonObject);
 	}
 }
 

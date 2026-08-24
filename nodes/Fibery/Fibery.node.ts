@@ -4,7 +4,7 @@ import type {
 	INodeType,
 	INodeTypeDescription,
 } from 'n8n-workflow';
-import { NodeConnectionType, NodeOperationError } from 'n8n-workflow';
+import { NodeConnectionTypes, NodeOperationError } from 'n8n-workflow';
 import * as database from './actions/database/Database.resource';
 import * as entity from './actions/entity/Entity.resource';
 import * as listSearch from './actions/methods/listSearch';
@@ -17,12 +17,13 @@ export class Fibery implements INodeType {
 		icon: 'file:fibery.svg',
 		group: ['input'],
 		version: 1,
+		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',
 		description: 'Read, update, write and delete data from Fibery',
 		defaults: {
 			name: 'Fibery',
 		},
-		inputs: [NodeConnectionType.Main],
-		outputs: [NodeConnectionType.Main],
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'fiberyTokenApi',

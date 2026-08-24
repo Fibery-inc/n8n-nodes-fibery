@@ -3,12 +3,15 @@ import type {
 	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
+	Icon,
 } from 'n8n-workflow';
 
 export class FiberyTokenApi implements ICredentialType {
 	name = 'fiberyTokenApi';
 
 	displayName = 'Fibery API Key API';
+
+	icon: Icon = 'file:fibery.svg';
 
 	documentationUrl = 'https://the.fibery.io/@public/User_Guide/Guide/Fibery-API-keys-252';
 

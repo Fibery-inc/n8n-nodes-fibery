@@ -5,7 +5,7 @@ import type {
 	IWebhookFunctions,
 	IWebhookResponseData,
 } from 'n8n-workflow';
-import { NodeConnectionType } from 'n8n-workflow';
+import { NodeConnectionTypes } from 'n8n-workflow';
 import { databaseRLC } from './actions/common.descriptions';
 import * as listSearch from './actions/methods/listSearch';
 import { apiRequest } from './actions/transport';
@@ -17,12 +17,13 @@ export class FiberyTrigger implements INodeType {
 		icon: 'file:fibery.svg',
 		group: ['trigger'],
 		version: 1,
+		subtitle: '={{$parameter["database"]}}',
 		description: 'Handle Fibery events to Database from webhooks',
 		defaults: {
 			name: 'Fibery Trigger',
 		},
 		inputs: [],
-		outputs: [NodeConnectionType.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'fiberyTokenApi',
