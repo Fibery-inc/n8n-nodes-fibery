@@ -148,7 +148,7 @@ export const operatorToCommand: {
 	},
 	select: {
 		is: (field, param) => [['=', [field, 'fibery/id'], param]],
-		is_not: (field, param) => [['=', [field, 'fibery/id'], param]],
+		is_not: (field, param) => [['!=', [field, 'fibery/id'], param]],
 		is_empty: (field, param) => [['=', [field, 'fibery/id'], param], null],
 		is_not_empty: (field, param) => [['!=', [field, 'fibery/id'], param], null],
 	},
