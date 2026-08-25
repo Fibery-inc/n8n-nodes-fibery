@@ -14,7 +14,7 @@ export class Fibery implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Fibery',
 		name: 'fibery',
-		icon: 'file:fibery.svg',
+		icon: {light: 'file:fibery.svg', dark: 'file:fibery-dark.svg'},
 		group: ['input'],
 		version: 1,
 		subtitle: '={{$parameter["operation"] + ": " + $parameter["resource"]}}',

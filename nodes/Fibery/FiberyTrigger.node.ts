@@ -14,7 +14,7 @@ export class FiberyTrigger implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Fibery Trigger',
 		name: 'fiberyTrigger',
-		icon: 'file:fibery.svg',
+		icon: {light: 'file:fibery.svg', dark: 'file:fibery-dark.svg'},
 		group: ['trigger'],
 		version: 1,
 		subtitle: '={{$parameter["database"]}}',

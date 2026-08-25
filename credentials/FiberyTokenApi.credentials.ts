@@ -11,7 +11,7 @@ export class FiberyTokenApi implements ICredentialType {
 
 	displayName = 'Fibery API Key API';
 
-	icon: Icon = 'file:fibery.svg';
+	icon: Icon = {light: 'file:fibery.svg', dark: 'file:fibery-dark.svg'};
 
 	documentationUrl = 'https://the.fibery.io/@public/User_Guide/Guide/Fibery-API-keys-252';
 
