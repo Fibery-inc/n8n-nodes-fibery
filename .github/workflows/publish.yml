@@ -74,10 +74,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/setup@v1
+      # n8n-node release calls `npm publish` for OIDC; pnpm runtime has node only.
+      - uses: actions/setup-node@v7
         with:
-          runtime: node@lts
+          node-version: '24.18.0'
+          package-manager-cache: false
+      - uses: pnpm/setup@v2
+        with:
           cache: true
 
       - name: Release
-        run: pnpm run release
+        run: |
+          echo "node=$(node -v) npm=$(npm -v) npm=$(command -v npm)"
+          pnpm run release
