@@ -5,7 +5,7 @@ import {
 	INodeProperties,
 	updateDisplayOptions,
 } from 'n8n-workflow';
-import { entityInput, entityOutput } from '../common.descriptions';
+import { entityOutput } from '../common.descriptions';
 import { prepareFiberyError } from '../helpers/utils';
 import {
 	addCollectionItems,
@@ -27,7 +27,33 @@ const displayOptions = {
 	},
 };
 
-const properties: INodeProperties[] = [...entityOutput, ...entityInput];
+const properties: INodeProperties[] = [
+	...entityOutput,
+	{
+		displayName: 'Fields',
+		name: 'fields',
+		type: 'resourceMapper',
+		default: {
+			mappingMode: 'defineBelow',
+			value: null,
+		},
+		noDataExpression: true,
+		required: true,
+		typeOptions: {
+			loadOptionsDependsOn: ['database.value'],
+			resourceMapper: {
+				resourceMapperMethod: 'getFields',
+				mode: 'add',
+				fieldWords: {
+					singular: 'field',
+					plural: 'fields',
+				},
+				addAllFields: true,
+				multiKeyMatch: false,
+			},
+		},
+	},
+];
 
 export const description = updateDisplayOptions(displayOptions, properties);
 
@@ -43,11 +69,23 @@ export async function execute(
 
 	const typeObject = schema.getTypeObjectByName(database);
 
+	const dataMode = this.getNodeParameter('fields.mappingMode', 0) as string;
+
 	for (let i = 0; i < items.length; i++) {
 		try {
-			const fieldValues = this.getNodeParameter('fields.field', i, []) as IDataObject[];
+			let fieldValues: IDataObject;
 
-			const { entity, collections, collabDocs } = buildEntityUpdate(
+			if (dataMode === 'autoMapInputData') {
+				// Use the input item's JSON data directly
+				fieldValues = items[i].json;
+			} else {
+				// Get the mapped fields from the resourceMapper
+				fieldValues = this.getNodeParameter('fields.value', i, {}) as IDataObject;
+			}
+
+			// Build entity update from fields (includes all field types)
+			const { entity, collections, collabDocs } = await buildEntityUpdate(
+				this,
 				fieldValues,
 				typeObject,
 				schema,

@@ -108,7 +108,24 @@ const nameOverrides: Record<string, string> = {
 };
 
 const toTypeOrFieldTitle = (name: string) => {
-	return replaceTildes(capitalize(name));
+	// If name has tildes, split and capitalize each segment (only if lowercase)
+	if (hasTildes(name)) {
+		return name
+			.split('~')
+			.map((segment) => (segment === segment.toLowerCase() ? capitalize(segment) : segment))
+			.join(' ');
+	}
+
+	// If name has spaces, handle each word (only capitalize if lowercase)
+	if (name.includes(' ')) {
+		return name
+			.split(' ')
+			.map((word) => (word === word.toLowerCase() ? capitalize(word) : word))
+			.join(' ');
+	}
+
+	// Single word: only capitalize if it's all lowercase
+	return name === name.toLowerCase() ? capitalize(name) : name;
 };
 
 export const toNonEnumTitle = (strName: string) => {
