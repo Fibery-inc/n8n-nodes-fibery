@@ -1,5 +1,5 @@
 {
-	"node": "n8n-nodes-base.fiberyTrigger",
+	"node": "@fibery/n8n-nodes-fibery.fiberyTrigger",
 	"nodeVersion": "1.0",
 	"codexVersion": "1.0",
 	"categories": ["Productivity", "Data & Storage"],
